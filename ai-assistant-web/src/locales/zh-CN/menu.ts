@@ -6,6 +6,8 @@ export default {
   "menu.renewal": "AI 续费",
   "menu.renewal.opportunities": "续费机会",
   "menu.renewal.diagnosis": "学生条件诊断",
+  "menu.learning": "AI学情",
+  "menu.learning.students": "学生学情列表",
   "menu.aiConfig": "AI 配置",
   "menu.aiConfig.platformAssistant": "平台助手配置",
   "menu.aiConfig.complaintRisk": "客诉预警配置",

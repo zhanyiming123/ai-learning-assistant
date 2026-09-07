@@ -1,0 +1,2661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>服务中学生概览 · 两种落地形式预览 (唯寻国际教育)</title>
+  <style>
+    :root {
+      --ant-primary: #1677ff;
+      --ant-primary-hover: #4096ff;
+      --ant-primary-active: #0958d9;
+      --ant-primary-bg: #e6f4ff;
+      --ant-success: #52c41a;
+      --ant-success-bg: #f6ffed;
+      --ant-success-border: #b7eb8f;
+      --ant-warning: #faad14;
+      --ant-warning-bg: #fffbe6;
+      --ant-warning-border: #ffe58f;
+      --ant-error: #ff4d4f;
+      --ant-error-bg: #fff2f0;
+      --ant-error-border: #ffccc7;
+      --ai-purple: #722ed1;
+      --ai-purple-bg: #f9f0ff;
+      --ai-purple-border: #d3adf7;
+      --text-main: #1f2937;
+      --text-secondary: #4b5563;
+      --text-tertiary: #8c8c8c;
+      --bg-page: #f0f2f5;
+      --bg-card: #ffffff;
+      --border-color: #e5e7eb;
+      --border-light: #f0f0f0;
+      --radius: 6px;
+      --sidebar-dark: #0f1e36;
+      --sidebar-dark-hover: #1b2f4f;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: #f0f2f5;
+      color: var(--text-main);
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ================= 0. 顶部形态切换栏 (固定 42px) ================= */
+    .prototype-mode-bar {
+      height: 42px;
+      background: #0b1526;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      z-index: 100;
+      border-bottom: 1px solid #1e293b;
+    }
+    .mode-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .mode-bar-label {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+    .mode-segmented-control {
+      display: flex;
+      background: #1e293b;
+      padding: 2px;
+      border-radius: 6px;
+      gap: 2px;
+    }
+    .mode-segmented-item {
+      padding: 4px 14px;
+      font-size: 12.5px;
+      color: #94a3b8;
+      background: transparent;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .mode-segmented-item:hover {
+      color: #ffffff;
+      background: rgba(255,255,255,0.06);
+    }
+    .mode-segmented-item.active {
+      color: #ffffff;
+      background: var(--ant-primary);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .mode-sub-pill {
+      font-size: 10.5px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.18);
+      font-weight: normal;
+    }
+    .mode-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .mode-tip-highlight {
+      color: #38bdf8;
+      font-weight: 500;
+    }
+
+    /* ================= 模式容器外壳 ================= */
+    .mode-view-root {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ================= 宽屏适配与自适应居中容器规范 ================= */
+    .header-inner-wrapper,
+    .tabs-inner-wrapper,
+    .overview-grid-container,
+    .trad-content-container {
+      width: 100%;
+      max-width: 1460px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 16px;
+      padding-right: 16px;
+      box-sizing: border-box;
+    }
+
+    @media (min-width: 2200px) {
+      .header-inner-wrapper,
+      .tabs-inner-wrapper,
+      .overview-grid-container,
+      .trad-content-container {
+        max-width: 1580px;
+      }
+    }
+
+    /* ================= 形式一：独立 AI 工作台样式 ================= */
+    .ai-workspace-view {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+    .ai-roster-sidebar {
+      width: 240px;
+      min-width: 240px;
+      max-width: 240px;
+      flex: 0 0 240px;
+      background: #ffffff;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.2s ease;
+      z-index: 10;
+    }
+    .ai-roster-sidebar.collapsed {
+      margin-left: -240px;
+    }
+    .roster-header {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: #111827;
+      font-size: 13px;
+    }
+    .roster-filter-box {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border-light);
+      background: #fafafa;
+    }
+    .roster-search-input {
+      width: 100%;
+      height: 28px;
+      padding: 0 8px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 12px;
+      outline: none;
+    }
+    .roster-search-input:focus {
+      border-color: var(--ant-primary);
+      box-shadow: 0 0 0 2px rgba(22,119,255,0.1);
+    }
+    .roster-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 8px;
+    }
+    .roster-item {
+      padding: 10px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 4px;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .roster-item:hover {
+      background: #f9fafb;
+    }
+    .roster-item.active {
+      background: #e6f4ff;
+      border-color: #91caff;
+    }
+    .roster-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+    .roster-item-name {
+      font-weight: 600;
+      color: #111827;
+      font-size: 13px;
+    }
+    .roster-item-id {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-family: monospace;
+    }
+    .roster-item-school {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .roster-item-tags {
+      display: flex;
+      gap: 3px;
+      flex-wrap: wrap;
+    }
+    .mini-tag {
+      font-size: 10.5px;
+      padding: 0 4px;
+      border-radius: 2px;
+      background: #f3f4f6;
+      color: var(--text-secondary);
+    }
+    .mini-tag.warn {
+      background: #fffbe6;
+      color: #d48806;
+      border: 1px solid #ffe58f;
+    }
+    .mini-tag.orange {
+      background: #fff7e6;
+      color: #d46b08;
+      border: 1px solid #ffd591;
+    }
+
+    .ai-main-area {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .ai-top-header-bar {
+      height: 48px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .ai-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-toggle-roster {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      color: #4b5563;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-toggle-roster:hover {
+      background: #e5e7eb;
+    }
+    .ai-system-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ai-version-pill {
+      font-size: 11px;
+      background: var(--ai-purple-bg);
+      color: var(--ai-purple);
+      border: 1px solid var(--ai-purple-border);
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+    .ai-meta-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: #64748b;
+    }
+    .ai-meta-pill {
+      background: #f1f5f9;
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: #475569;
+    }
+    .ai-meta-pill strong {
+      color: #0f172a;
+    }
+
+    .ai-viewport-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 0 24px;
+    }
+
+    /* ================= 形式二：还原截图班主任工作台 ================= */
+    .workbench-view {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      overflow: hidden;
+      background: #f0f2f5;
+    }
+
+    /* 截图左侧深蓝导航栏 (严格复原) */
+    .wb-left-nav-bar {
+      width: 176px;
+      min-width: 176px;
+      max-width: 176px;
+      background: var(--sidebar-dark);
+      color: #a6b9d0;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      user-select: none;
+      border-right: 1px solid #081220;
+    }
+    .wb-nav-logo-box {
+      height: 52px;
+      padding: 0 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #091322;
+      border-bottom: 1px solid #14243b;
+    }
+    .wb-logo-txt-en {
+      font-size: 11px;
+      color: #ffffff;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-family: Arial, sans-serif;
+    }
+    .wb-logo-txt-cn {
+      font-size: 10.5px;
+      color: #7993b5;
+      transform: scale(0.95);
+      transform-origin: left;
+    }
+    .wb-nav-group-title {
+      font-size: 11px;
+      color: #4f698d;
+      padding: 10px 14px 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .wb-nav-item {
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 12.5px;
+      color: #a0b3cc;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .wb-nav-item:hover {
+      background: var(--sidebar-dark-hover);
+      color: #ffffff;
+    }
+    .wb-nav-item.active {
+      background: #1677ff;
+      color: #ffffff;
+      font-weight: 500;
+    }
+    .wb-nav-sub-list {
+      padding-left: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: #091424;
+      padding-top: 4px;
+      padding-bottom: 6px;
+    }
+    .wb-nav-sub-item {
+      padding: 5px 12px;
+      font-size: 12px;
+      color: #7e94b2;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .wb-nav-sub-item:hover {
+      color: #ffffff;
+      background: rgba(255,255,255,0.05);
+    }
+    .wb-nav-bottom-actions {
+      margin-top: auto;
+      padding: 8px 12px;
+      border-top: 1px solid #14243b;
+      background: #0a1526;
+      font-size: 12px;
+    }
+
+    /* 截图右侧工作台主体容器 */
+    .wb-main-container {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #f0f2f5;
+    }
+
+    /* 截图顶部工作台状态条 */
+    .top-workbench-bar {
+      height: 48px;
+      background: #ffffff;
+      border-bottom: 1px solid #e8e8e8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+    }
+    .top-wb-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .wb-collapse-trigger {
+      font-size: 15px;
+      color: #595959;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .wb-collapse-trigger:hover {
+      background: #f5f5f5;
+    }
+    .wb-system-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #262626;
+    }
+    .wb-banner-notice {
+      background: #fffbe6;
+      border: 1px solid #ffe58f;
+      color: #d48806;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .top-wb-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-share-feedback {
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #262626;
+      cursor: pointer;
+    }
+    .btn-share-feedback:hover {
+      border-color: var(--ant-primary);
+      color: var(--ant-primary);
+    }
+    .btn-share-timetable {
+      background: var(--ant-primary);
+      border: 1px solid var(--ant-primary);
+      color: #ffffff;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .wb-bell-box {
+      position: relative;
+      cursor: pointer;
+      padding: 4px;
+      font-size: 15px;
+      color: #595959;
+    }
+    .wb-bell-dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: #ff4d4f;
+      color: #fff;
+      font-size: 9px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: #262626;
+    }
+    .user-avatar-dot {
+      width: 24px;
+      height: 24px;
+      background: #faad14;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 11px;
+    }
+
+    /* 截图学员头部信息栏 */
+    .student-dossier-header {
+      background: #ffffff;
+      border-bottom: 1px solid #e8e8e8;
+      padding: 10px 0;
+      flex-shrink: 0;
+    }
+    .header-top-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .student-meta-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+    .back-link {
+      color: #595959;
+      text-decoration: none;
+      font-size: 12px;
+      margin-right: 4px;
+    }
+    .back-link:hover {
+      color: var(--ant-primary);
+    }
+    .stu-label-gray {
+      color: #8c8c8c;
+    }
+    .stu-badge-tier {
+      background: #2b2b2b;
+      color: #f7d68a;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 3px;
+      letter-spacing: 0.5px;
+    }
+    .current-stu-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #141414;
+    }
+    .current-stu-phone {
+      color: #262626;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    .tag-complaint-pill {
+      background: #ff4d4f;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 10px;
+    }
+    .stu-switcher-select {
+      font-size: 12px;
+      height: 26px;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
+      padding: 0 6px;
+      outline: none;
+      background: #fff;
+    }
+    .btn-tools-icon {
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #595959;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-tools-icon:hover {
+      border-color: var(--ant-primary);
+      color: var(--ant-primary);
+    }
+
+    /* 截图完整横向 Tab 栏 */
+    .horizontal-tabs-bar {
+      background: #ffffff;
+      border-bottom: 1px solid #e8e8e8;
+      flex-shrink: 0;
+    }
+    .horizontal-tabs-bar .tabs-inner-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: thin;
+    }
+    .tab-nav-btn {
+      padding: 9px 12px;
+      font-size: 13px;
+      color: #595959;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .tab-nav-btn:hover {
+      color: var(--ant-primary);
+    }
+    .tab-nav-btn.active {
+      color: var(--ant-primary);
+      font-weight: 600;
+      border-bottom-color: var(--ant-primary);
+    }
+    .tab-nav-btn.ai-enhanced-tab {
+      color: #722ed1;
+      font-weight: 600;
+    }
+    .tab-nav-btn.ai-enhanced-tab.active {
+      color: #722ed1;
+      border-bottom-color: #722ed1;
+    }
+    .tab-badge-ai {
+      font-size: 10px;
+      background: #f9f0ff;
+      color: #722ed1;
+      border: 1px solid #d3adf7;
+      padding: 0 4px;
+      border-radius: 8px;
+      margin-left: 2px;
+    }
+
+    /* 截图内容视口 */
+    .wb-content-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 0 24px;
+    }
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* 形式二顶部嵌入的【AI 近况概览速览卡】 */
+    .embedded-ai-overview-card {
+      background: linear-gradient(180deg, #faf5ff 0%, #ffffff 100%);
+      border: 1px solid #e9d5ff;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(114, 46, 209, 0.05);
+    }
+    .embedded-ai-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #eeddfc;
+    }
+    .embedded-ai-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #581c87;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .embedded-ai-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .embedded-summary-box {
+      font-size: 13.5px;
+      color: #1f2937;
+      line-height: 1.55;
+    }
+    .embedded-facts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+    .embedded-fact-item {
+      color: #374151;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .embedded-fact-item strong {
+      color: #1f2937;
+    }
+
+    /* 截图传统信息卡片 (100% 还原截图 UI) */
+    .trad-card {
+      background: #ffffff;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .trad-section-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 6px;
+    }
+    .trad-form-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px 16px;
+      font-size: 12.5px;
+    }
+    .trad-form-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .trad-form-label {
+      color: #8c8c8c;
+      white-space: nowrap;
+      min-width: 75px;
+      text-align: right;
+    }
+    .trad-form-val {
+      color: #262626;
+      word-break: break-word;
+    }
+    .trad-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+    }
+    .trad-table th {
+      background: #fafafa;
+      color: #595959;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .trad-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      color: #262626;
+    }
+    .trad-table tr:hover td {
+      background: #fafafa;
+    }
+
+    /* ================= 业务公共：AI 近况概览核心组件 ================= */
+    .card-basic-compact {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .basic-compact-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .basic-name-tag {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stage-badge-service {
+      background: #e6f4ff;
+      color: #0958d9;
+      border: 1px solid #91caff;
+      font-size: 11.5px;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .compact-field {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .compact-field strong {
+      color: #1e293b;
+      font-weight: 600;
+    }
+    .compact-field-unmapped strong {
+      color: #94a3b8;
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    .card-overall {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .card-overall.ai-accent {
+      border-left: 4px solid var(--ai-purple);
+      background: linear-gradient(90deg, #faf5ff 0%, #ffffff 40%);
+    }
+    .overall-header-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ai-purple);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .overall-body-text {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: #1e293b;
+    }
+
+    /* 2x2 网格 */
+    .four-modules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .biz-module-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .biz-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .biz-card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .biz-card-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .status-tag-pill {
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .status-tag-pill.blue {
+      background: #e6f4ff;
+      color: #0958d9;
+      border: 1px solid #91caff;
+    }
+    .status-tag-pill.green {
+      background: #f6ffed;
+      color: #389e0d;
+      border: 1px solid #b7eb8f;
+    }
+    .status-tag-pill.gold {
+      background: #fffbe6;
+      color: #d48806;
+      border: 1px solid #ffe58f;
+    }
+    .status-tag-pill.gray {
+      background: #f5f5f5;
+      color: #595959;
+      border: 1px solid #d9d9d9;
+    }
+
+    .biz-card-body {
+      flex: 1;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .biz-card-body strong {
+      color: #111827;
+      font-weight: 600;
+    }
+    .biz-card-footer {
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px dashed var(--border-light);
+      font-size: 11px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .line-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .line-label {
+      color: #64748b;
+      white-space: nowrap;
+    }
+    .neutral-gray-note {
+      color: #6b7280;
+      font-size: 12px;
+    }
+
+    .card-attention {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .attention-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .attention-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .attention-items-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .attention-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+    .att-tag-chip {
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .att-tag-chip.risk {
+      background: #fff7e6;
+      color: #d46b08;
+      border: 1px solid #ffd591;
+    }
+    .att-tag-chip.gap {
+      background: #f5f5f5;
+      color: #595959;
+      border: 1px solid #d9d9d9;
+    }
+    .att-content {
+      color: #374151;
+      flex: 1;
+    }
+    .att-source-stamp {
+      color: var(--text-tertiary);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .ant-btn-link {
+      background: none;
+      border: none;
+      color: var(--ant-primary);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+    }
+    .ant-btn-link:hover {
+      color: var(--ant-primary-hover);
+      text-decoration: underline;
+    }
+
+    /* ================= Ant Design 风格抽屉 ================= */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 1000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .drawer-overlay.open {
+      display: block;
+      opacity: 1;
+    }
+    .drawer-container {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 580px;
+      max-width: 90vw;
+      background: #ffffff;
+      box-shadow: -6px 0 16px rgba(0, 0, 0, 0.08);
+      z-index: 1001;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer-overlay.open .drawer-container {
+      transform: translateX(0);
+    }
+    .drawer-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-title-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .drawer-title-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .drawer-close-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+    .drawer-close-btn:hover {
+      color: #1e293b;
+    }
+    .drawer-body-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      font-size: 13px;
+      color: #374151;
+      line-height: 1.6;
+    }
+    .drawer-sec-block {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 16px;
+    }
+    .drawer-sec-heading {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-desc-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      margin-top: 6px;
+    }
+    .drawer-desc-table th {
+      background: #fafafa;
+      padding: 6px 10px;
+      border: 1px solid #e8e8e8;
+      text-align: left;
+      color: #595959;
+    }
+    .drawer-desc-table td {
+      padding: 6px 10px;
+      border: 1px solid #e8e8e8;
+      color: #262626;
+    }
+    .drawer-desc-table tr:hover td {
+      background: #fbfbfb;
+    }
+    .drawer-desc-grid {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 6px 12px;
+      background: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      margin-bottom: 10px;
+    }
+    .drawer-desc-grid .dt {
+      color: #64748b;
+    }
+    .drawer-desc-grid .dd {
+      color: #1e293b;
+      font-weight: 500;
+    }
+    .feedback-log-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+    .feedback-log-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+    .feedback-log-date {
+      font-weight: 600;
+      color: #1e293b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= 0. 顶部形态切换控制器 (固定42px) ================= -->
+  <header class="prototype-mode-bar">
+    <div class="mode-bar-left">
+      <span class="mode-bar-label">页面落地形态切换：</span>
+      <div class="mode-segmented-control">
+        <button id="btnModeWorkbench" class="mode-segmented-item active" onclick="switchViewMode('workbench')">
+          <span>🏫 形式二：现有班主任工作台</span>
+          <span class="mode-sub-pill">复原截图 + 融入AI概览</span>
+        </button>
+        <button id="btnModeAI" class="mode-segmented-item" onclick="switchViewMode('ai')">
+          <span>🤖 形式一：独立 AI 工作台展示</span>
+          <span class="mode-sub-pill">纯粹 AI 概览</span>
+        </button>
+      </div>
+    </div>
+    <div class="mode-bar-right">
+      <span>已载入真实测试学员：<strong class="mode-tip-highlight">张翰涵 (1000011527)</strong></span>
+      <span>基准日期：<strong>2026-09-07</strong></span>
+    </div>
+  </header>
+
+  <!-- ================= 主视口容器 ================= -->
+  <div class="mode-view-root">
+
+    <!-- ================= 形式一：独立 AI 工作台 ================= -->
+    <main id="viewAI" class="ai-workspace-view" style="display:none;">
+
+      <!-- 形式一左侧学员列表 (固定 240px，可折叠) -->
+      <aside id="aiRosterSidebar" class="ai-roster-sidebar">
+        <div class="roster-header">
+          <span>学员列表 (在服)</span>
+          <span style="font-size:11px; color:#6b7280; font-weight:normal;">共 4 人</span>
+        </div>
+        <div class="roster-filter-box">
+          <input type="text" class="roster-search-input" placeholder="🔍 搜索姓名、编号、学校..." oninput="handleRosterSearch(this.value)" />
+        </div>
+        <div id="aiRosterList" class="roster-list">
+          <!-- 由 JS 渲染 -->
+        </div>
+      </aside>
+
+      <!-- 形式一主工作区 (宽屏居中自适应) -->
+      <div class="ai-main-area">
+        <!-- 顶部控制条 -->
+        <div class="ai-top-header-bar">
+          <div class="ai-brand-group">
+            <button class="btn-toggle-roster" onclick="toggleAiRoster()" title="展开/收起学员列表">☰ 列表</button>
+            <div class="ai-system-title">
+              <span>服务中学生近况概览</span>
+              <span class="ai-version-pill">AI 智能座舱 V1</span>
+            </div>
+          </div>
+          <div class="ai-meta-right">
+            <div class="ai-meta-pill">概览基准日期：<strong>2026-09-07</strong></div>
+            <div class="ai-meta-pill">生成时间：<strong>2026-09-07 10:30</strong></div>
+            <button class="ant-btn-link" onclick="copyMarkdownSummary()">📋 复制 Markdown</button>
+            <button class="ant-btn-link" onclick="openDrawer('all_evidence')">查看依据抽屉</button>
+          </div>
+        </div>
+
+        <!-- 概览正文视口 (宽屏 1460px 居中) -->
+        <div class="ai-viewport-scroll">
+          <div class="overview-grid-container">
+
+            <!-- 1. 紧凑基本信息行 -->
+            <section class="card-basic-compact">
+              <div class="basic-compact-left">
+                <div class="basic-name-tag">
+                  <span id="aiStuName">张翰涵</span>
+                  <span class="stage-badge-service">服务中</span>
+                </div>
+                <span style="color:#d1d5db;">|</span>
+                <div class="compact-field">学校：<strong id="aiStuSchool">(UK) Headington School</strong></div>
+                <span style="color:#d1d5db;">|</span>
+                <div class="compact-field">年级：<strong id="aiStuGrade">大一</strong></div>
+                <span style="color:#d1d5db;">|</span>
+                <div class="compact-field compact-field-unmapped">服务团队：<strong id="aiStuTeam" style="font-weight:500; color:#8c8c8c;">待核实</strong></div>
+              </div>
+              <div>
+                <button class="ant-btn-link" onclick="openDrawer('basic')">查看详情</button>
+              </div>
+            </section>
+
+            <!-- 2. 总体近况 (2句话，约80字，文案自然化) -->
+            <section class="card-overall ai-accent">
+              <div class="overall-header-text">
+                <span>✨ 总体近况（服务中模板 V1）</span>
+              </div>
+              <div id="aiOverallText" class="overall-body-text">
+                现有资料显示，学生在<strong>9—10月有数学和化学课表安排（化学在读中、数学待开课）</strong>，升学申请已获<strong>爱丁堡大学与KCL录取</strong>。学情与沟通记录停留在<strong>5—6月</strong>，当前最新学习状态与家长反馈<strong>不足以判断</strong>。
+              </div>
+            </section>
+
+            <!-- 3. 2x2 网格业务模块 (彻底去掉多余状态标签，标题+查看详情) -->
+            <div class="four-modules-grid">
+              <article class="biz-module-card">
+                <div class="biz-card-header">
+                  <div class="biz-card-title-group">
+                    <span class="biz-card-title">学习情况</span>
+                  </div>
+                  <button class="ant-btn-link" onclick="openDrawer('academic')">查看详情</button>
+                </div>
+                <div class="biz-card-body" id="aiAcademicBody">
+                  <p><strong>数学</strong>｜最近评价：2026-06-18（考前复盘完成），统计薄弱、力学稳定；历史模考：05-24 EDX 38分(E等第，历史预警)。</p>
+                  <p class="neutral-gray-note">化学：暂无近期随堂评价。</p>
+                </div>
+                <div class="biz-card-footer">
+                  <span>来源：授课反馈 (2026-06-18) · 模考报告 (2026-05-24)</span>
+                </div>
+              </article>
+
+              <article class="biz-module-card">
+                <div class="biz-card-header">
+                  <div class="biz-card-title-group">
+                    <span class="biz-card-title">升学与规划</span>
+                  </div>
+                  <button class="ant-btn-link" onclick="openDrawer('admission')">查看详情</button>
+                </div>
+                <div class="biz-card-body" id="aiAdmissionBody">
+                  <div class="line-row"><span class="line-label">申请结果：</span><span>2026秋 获 <strong>爱丁堡大学</strong>(Chemistry)、<strong>KCL</strong>(Chemistry)录取，<strong>UCL</strong>拒信；<span class="neutral-gray-note">录取条件及入读结果未提供</span></span></div>
+                  <div class="line-row"><span class="line-label">规划服务：</span><span>10年级规划服务记录为已完成（至 2026-06-30）</span></div>
+                  <div class="line-row"><span class="line-label">文书服务：</span><span>英国本科文书记录为未开始服务</span></div>
+                </div>
+                <div class="biz-card-footer">
+                  <span>来源：申请台账 · 规划系统 · 文书系统</span>
+                </div>
+              </article>
+
+              <article class="biz-module-card">
+                <div class="biz-card-header">
+                  <div class="biz-card-title-group">
+                    <span class="biz-card-title">课程与产品服务</span>
+                  </div>
+                  <button class="ant-btn-link" onclick="openDrawer('course')">查看详情</button>
+                </div>
+                <div class="biz-card-body" id="aiCourseBody">
+                  <div class="line-row"><span class="line-label">在读及待上：</span><span><strong>化学 1v1</strong>（09/05开课，每周在读）、<strong>数学 1v1 金牌</strong>（09/12待开课，已排课至10/18，9/27单日排课）</span></div>
+                  <div class="line-row"><span class="line-label">课时情况：</span><span>ALEVEL-1v1 已排未上 <strong>19.5 课时</strong> / 剩余未排 <strong>3.75 课时</strong>；金牌 已排未上 <strong>24 课时</strong> / 剩余未排 <strong>0.75 课时</strong></span></div>
+                </div>
+                <div class="biz-card-footer">
+                  <span>来源：学员课表流水 (共15条) · 签约产品订单</span>
+                </div>
+              </article>
+
+              <article class="biz-module-card">
+                <div class="biz-card-header">
+                  <div class="biz-card-title-group">
+                    <span class="biz-card-title">近期沟通与反馈</span>
+                  </div>
+                  <button class="ant-btn-link" onclick="openDrawer('communication')">查看详情</button>
+                </div>
+                <div class="biz-card-body" id="aiCommBody">
+                  <div class="line-row"><span class="line-label">学生沟通：</span><span>2026-06-28 电话访谈学生（人在英国，家长在国内），反馈状态波动、作业与模考表现不理想。</span></div>
+                  <div class="line-row"><span class="line-label">家长同步：</span><span>学管已向家长同步并进行预警；<span class="neutral-gray-note">未提供家长对预警的反馈及后续记录</span>。</span></div>
+                </div>
+                <div class="biz-card-footer">
+                  <span>来源：学管家校访谈记录 (累计38条)</span>
+                </div>
+              </article>
+            </div>
+
+            <!-- 4. 关注信息 -->
+            <section class="card-attention">
+              <div class="attention-card-header">
+                <div class="attention-card-title">
+                  <span>⚠️ 关注信息（当前风险与信息缺口）</span>
+                </div>
+                <button class="ant-btn-link" onclick="openDrawer('attention')">查看详情与依据</button>
+              </div>
+              <div class="attention-card-body">
+                <ul class="attention-items-list" id="aiAttentionList">
+                  <li class="attention-row">
+                    <span class="att-tag-chip risk">历史预警</span>
+                    <span class="att-content">数学存在历史目标达成预警（达到 B—A 目标有困难，预计大考C及以下），自06-18考前复盘后缺少后续大考与近期学情更新。</span>
+                    <span class="att-source-stamp">（2026-05-24 模考）</span>
+                  </li>
+                  <li class="attention-row">
+                    <span class="att-tag-chip gap">信息缺口</span>
+                    <span class="att-content">记录中存在客诉标签，但事件、原因、时间和处理状态未提供，无法判断严重程度及是否闭环。</span>
+                    <span class="att-source-stamp">（更新时间未提供）</span>
+                  </li>
+                  <li class="attention-row">
+                    <span class="att-tag-chip gap">资金关注</span>
+                    <span class="att-content">累计退款/变更金额达 ¥203,145.26，当前未消耗金额 ¥46,429.72，需结合秋季在读课程与课表安排关注消课节奏。</span>
+                    <span class="att-source-stamp">（财务订单台账）</span>
+                  </li>
+                </ul>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ================= 形式二：现有班主任工作台 (100% 还原截图 + 融入AI近况概览) ================= -->
+    <main id="viewWorkbench" class="workbench-view" style="display:flex;">
+
+      <!-- 1. 截图左侧深蓝导航栏 (完全复原截图) -->
+      <aside class="wb-left-nav-bar">
+        <div class="wb-nav-logo-box">
+          <span class="wb-logo-txt-en">VISION ACADEMY</span>
+          <span class="wb-logo-txt-cn">唯寻国际教育</span>
+        </div>
+        
+        <div class="wb-nav-group-title">工作台</div>
+        <div class="wb-nav-item"><span style="font-size:14px;">📋</span><span>待办</span></div>
+        <div class="wb-nav-item"><span style="font-size:14px;">📅</span><span>学员课表</span></div>
+        <div class="wb-nav-item active"><span style="font-size:14px;">👥</span><span>学员</span></div>
+        <div class="wb-nav-item"><span style="font-size:14px;">🏫</span><span>班级</span></div>
+        <div class="wb-nav-item"><span style="font-size:14px;">⚙️</span><span>服务</span></div>
+
+        <!-- 截图中的学员子模块菜单 -->
+        <div class="wb-nav-sub-list">
+          <div class="wb-nav-sub-item">反馈</div>
+          <div class="wb-nav-sub-item">作业</div>
+          <div class="wb-nav-sub-item">模考送卷</div>
+          <div class="wb-nav-sub-item">模考报告</div>
+          <div class="wb-nav-sub-item">学情报告</div>
+          <div class="wb-nav-sub-item">访谈记录</div>
+          <div class="wb-nav-sub-item">预约排课</div>
+          <div class="wb-nav-sub-item">续排方案</div>
+          <div class="wb-nav-sub-item">课表查询</div>
+          <div class="wb-nav-sub-item">督学课</div>
+          <div class="wb-nav-sub-item">论文竞赛</div>
+          <div class="wb-nav-sub-item">学员积分</div>
+        </div>
+
+        <div class="wb-nav-bottom-actions">
+          <div class="wb-nav-item" style="padding:4px 0;"><span style="font-size:14px;">👥</span><span>转介资源</span></div>
+          <div class="wb-nav-item" style="padding:4px 0;"><span style="font-size:14px;">📝</span><span>催退记录</span></div>
+          <div class="wb-nav-item" style="padding:4px 0;"><span style="font-size:14px;">🔒</span><span>管理</span></div>
+          <div class="wb-nav-item" style="padding:4px 0;"><span style="font-size:14px;">📊</span><span>计划</span></div>
+        </div>
+      </aside>
+
+      <!-- 2. 截图右侧主工作台容器 -->
+      <div class="wb-main-container">
+
+        <!-- 顶部状态栏 (截图同款) -->
+        <div class="top-workbench-bar">
+          <div class="top-wb-left">
+            <span class="wb-collapse-trigger" title="展开/收起导航">≡</span>
+            <span class="wb-system-title">班主任工作台</span>
+            <div class="wb-banner-notice">
+              <span>📢 当日首课 0 人；一周内首课 0 人</span>
+            </div>
+          </div>
+          <div class="top-wb-right">
+            <button class="btn-share-feedback" onclick="alert('已分享学生反馈流水')">分享反馈</button>
+            <button class="btn-share-timetable" onclick="alert('已分享学生课表')">分享课表</button>
+            <div class="wb-bell-box" title="通知消息">
+              <span>🔔</span>
+              <span class="wb-bell-dot">1</span>
+            </div>
+            <div class="user-profile-badge">
+              <div class="user-avatar-dot">戚</div>
+              <span>戚兴玲</span>
+              <span style="color:#8c8c8c; cursor:pointer;" onclick="alert('已退出')">退出</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 学员头部信息栏 (截图同款) -->
+        <div class="student-dossier-header">
+          <div class="header-inner-wrapper">
+            <div class="header-top-line">
+              <div class="student-meta-summary">
+                <a class="back-link" href="javascript:void(0)" onclick="alert('返回学员列表')">‹ 返回</a>
+                <span class="stu-label-gray">学员姓名：</span>
+                <span id="wbHeaderTier" class="stu-badge-tier">展金</span>
+                <span id="wbHeaderStuName" class="current-stu-name">张翰涵(1000011527)</span>
+                <span class="stu-label-gray" style="margin-left:8px;">学员手机号：</span>
+                <span id="wbHeaderPhone" class="current-stu-phone">138****2926</span>
+                <span id="wbHeaderComplaintTag" class="tag-complaint-pill">客诉</span>
+
+                <!-- 便捷切换：可切换看真实测试学员张翰涵或截图学员陈芊含 -->
+                <div style="margin-left:14px; display:flex; align-items:center; gap:4px;">
+                  <span style="font-size:11px; color:#8c8c8c;">切换数据：</span>
+                  <select class="stu-switcher-select" onchange="selectStudent(this.value)">
+                    <option value="1000011527" selected>张翰涵 (真实测试全量数据)</option>
+                    <option value="C0000109842">陈芊含 (截图原生学员)</option>
+                    <option value="1000012891">李思睿 (物理A*在服)</option>
+                    <option value="1000010443">王泽宇 (文书冲刺期)</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <button class="btn-tools-icon" onclick="openDrawer('all_evidence')">
+                  <span>田</span> 工具栏
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 截图完整 Tab 栏 (新增【✨ AI 近况概览】) -->
+        <nav class="horizontal-tabs-bar">
+          <div class="tabs-inner-wrapper">
+            <div id="wbTabBtnBasic" class="tab-nav-btn active" onclick="switchWorkbenchTab('basic')">
+              <span>基本信息</span>
+            </div>
+            <!-- 这次新做的 AI 近况概览 Tab -->
+            <div id="wbTabBtnAi" class="tab-nav-btn ai-enhanced-tab" onclick="switchWorkbenchTab('ai')">
+              <span>✨ AI 近况概览</span>
+              <span class="tab-badge-ai">新</span>
+            </div>
+            <div class="tab-nav-btn" onclick="openDrawer('course')">订单信息</div>
+            <div class="tab-nav-btn" onclick="alert('报名信息')">报名信息</div>
+            <div class="tab-nav-btn" onclick="alert('培训经历')">培训经历</div>
+            <div class="tab-nav-btn" onclick="openDrawer('course')">课表</div>
+            <div class="tab-nav-btn" onclick="openDrawer('academic')">考试记录</div>
+            <div class="tab-nav-btn" onclick="alert('竞赛成绩')">竞赛成绩</div>
+            <div class="tab-nav-btn" onclick="openDrawer('academic')">科目成绩</div>
+            <div class="tab-nav-btn" onclick="alert('语言成绩')">语言成绩</div>
+            <div class="tab-nav-btn" onclick="openDrawer('admission')">申请记录</div>
+            <div class="tab-nav-btn" onclick="openDrawer('communication')">访谈记录</div>
+            <div class="tab-nav-btn" onclick="openDrawer('academic')">学情报告</div>
+            <div class="tab-nav-btn" onclick="alert('督学课')">督学课</div>
+            <div class="tab-nav-btn" onclick="openDrawer('academic')">模考</div>
+            <div class="tab-nav-btn" onclick="alert('考试报名')">考试报名</div>
+            <div class="tab-nav-btn" onclick="alert('唯寻实考')">唯寻实考</div>
+            <div class="tab-nav-btn" onclick="alert('牛剑档案')">牛剑档案</div>
+            <div class="tab-nav-btn" onclick="openDrawer('academic')">学生成绩</div>
+            <div class="tab-nav-btn" onclick="alert('营地反馈')">营地反馈</div>
+            <div class="tab-nav-btn" onclick="alert('学习数据')">学习数据</div>
+            <div class="tab-nav-btn" onclick="alert('备考训练')">备考训练</div>
+            <div style="margin-left:auto; color:#8c8c8c; cursor:pointer; font-size:13px;" title="自定义 Tab 排序">✏️</div>
+          </div>
+        </nav>
+
+        <!-- 内容区域 -->
+        <div class="wb-content-viewport">
+
+          <!-- ================= TAB 1: 截图原版【基本信息】+ 顶部嵌入 AI 近况概览速览卡 ================= -->
+          <div id="wbPaneBasic" class="tab-pane active">
+            <div class="trad-content-container">
+
+              <!-- 🌟 核心融合：在原系统基本信息表单上方，直接呈现 AI 服务中近况概览速览卡 -->
+              <section class="embedded-ai-overview-card">
+                <div class="embedded-ai-header">
+                  <div class="embedded-ai-title">
+                    <span>✨ AI 服务中近况概览</span>
+                    <span style="font-size:11px; font-weight:normal; background:#f3e8ff; color:#722ed1; padding:1px 6px; border-radius:10px;">1分钟速览</span>
+                    <span style="font-size:11px; color:#6b7280; font-weight:normal;">基准日期：2026-09-07 ｜ 生成时间：2026-09-07 10:30</span>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <button class="ant-btn-link" style="color:#722ed1; font-weight:600;" onclick="switchWorkbenchTab('ai')">切换至完整 2×2 概览视口 →</button>
+                    <button class="ant-btn-link" onclick="openDrawer('all_evidence')">查看依据抽屉</button>
+                  </div>
+                </div>
+                <div class="embedded-ai-body">
+                  <!-- 两句话总体近况 -->
+                  <div id="wbEmbeddedOverallText" class="embedded-summary-box">
+                    现有资料显示，学生在<strong>9—10月有数学和化学课表安排（化学在读中、数学待开课）</strong>，升学申请已获<strong>爱丁堡大学与KCL录取</strong>。学情与沟通记录停留在<strong>5—6月</strong>，当前最新学习状态与家长反馈<strong>不足以判断</strong>。
+                  </div>
+                  <!-- 核心事实速览行 (杜绝空洞标签，呈现关键事实) -->
+                  <div class="embedded-facts-row" id="wbEmbeddedFactsRow">
+                    <span class="embedded-fact-item">📚 <strong>学科重点</strong>：数学（06-18考前复盘）｜ 化学暂无近期评价</span>
+                    <span class="embedded-fact-item">🎓 <strong>升学录取</strong>：爱丁堡大学、KCL (Offer) ｜ UCL拒信</span>
+                    <span class="embedded-fact-item">📅 <strong>在读课表</strong>：化学 1v1 在读中 ｜ 数学金牌 09/12 开课</span>
+                    <span class="embedded-fact-item">📞 <strong>家校沟通</strong>：06-28 电话访谈学生已预警 ｜ 38条累计</span>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 截图卡片 1：学员标签 (100% 还原) -->
+              <div class="trad-card">
+                <div class="trad-section-title">
+                  <span>学员标签</span>
+                  <span style="font-size:12px; color:#8c8c8c; cursor:pointer;">🔔 提示 ｜ ✏️ 编辑 ｜ ⏱️ 记录</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px; font-size:12.5px;">
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <span style="color:#8c8c8c; width:65px;">警示类：</span>
+                    <span id="tradCardWarnTag" class="tag-complaint-pill">客诉</span>
+                  </div>
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <span style="color:#8c8c8c; width:65px;">指导类：</span>
+                    <div id="tradCardGuideTags" style="display:flex; gap:4px; flex-wrap:wrap;">
+                      <span class="mini-tag" style="background:#e6f4ff; color:#0958d9; border:1px solid #91caff;">近期学习波动</span>
+                      <span class="mini-tag" style="background:#e6f4ff; color:#0958d9; border:1px solid #91caff;">作业需关注</span>
+                      <span class="mini-tag" style="background:#e6f4ff; color:#0958d9; border:1px solid #91caff;">模考需关注</span>
+                      <span class="mini-tag" style="background:#e6f4ff; color:#0958d9; border:1px solid #91caff;">已预警家长</span>
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <span style="color:#8c8c8c; width:65px;">商品类：</span>
+                    <span id="tradCardTierTag" class="stu-badge-tier">展金</span>
+                  </div>
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <span style="color:#8c8c8c; width:65px;">线索类：</span>
+                    <span id="tradCardLeadTag" class="mini-tag" style="background:#f6ffed; color:#389e0d; border:1px solid #b7eb8f;">唯寻上海/全上海</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 截图卡片 2：基本信息四列网格 (100% 还原) -->
+              <div class="trad-card">
+                <div class="trad-section-title">
+                  <span>基本信息</span>
+                  <span style="font-size:12px; color:var(--ant-primary); cursor:pointer;">✏️ 编辑 ｜ 🔒 解密 ｜ ⚙️ 个性化 ˅</span>
+                </div>
+                <div class="trad-form-grid-4">
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">客户编号：</span>
+                    <span id="tradCustId" class="trad-form-val">C0000082891</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">学员编号：</span>
+                    <span id="tradStuId" class="trad-form-val">1000011527</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">学员姓名：</span>
+                    <span id="tradStuName" class="trad-form-val" style="font-weight:600;">张翰涵</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">性别：</span>
+                    <span id="tradGender" class="trad-form-val">男</span>
+                  </div>
+
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">在读学校：</span>
+                    <span id="tradSchool" class="trad-form-val">(UK) Headington School</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">在读年级：</span>
+                    <span id="tradGrade" class="trad-form-val">大一 ℹ️</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">归属学校：</span>
+                    <span id="tradCampus" class="trad-form-val">唯寻上海/全上海</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">高考年份：</span>
+                    <span class="trad-form-val">-</span>
+                  </div>
+
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">英文名：</span>
+                    <span class="trad-form-val">-</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">出生日期：</span>
+                    <span class="trad-form-val">-</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">微信号：</span>
+                    <span class="trad-form-val">🔒 已加密 (点击解密)</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">联系电话：</span>
+                    <span id="tradPhone" class="trad-form-val">138****2926</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 截图卡片 3：教育经历 (100% 还原) -->
+              <div class="trad-card">
+                <div class="trad-section-title">
+                  <span>教育经历</span>
+                  <span style="font-size:12px; color:var(--ant-primary); cursor:pointer;">+ 添加经历</span>
+                </div>
+                <table class="trad-table">
+                  <thead>
+                    <tr>
+                      <th style="width:60px;">序号</th>
+                      <th>在读状态</th>
+                      <th>学校名称</th>
+                      <th>在读年级</th>
+                      <th>地区</th>
+                      <th>入学时间</th>
+                      <th style="width:80px;">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tradEduTbody">
+                    <tr>
+                      <td>1</td>
+                      <td><span class="status-tag-pill green">在读</span></td>
+                      <td>(UK) Headington School</td>
+                      <td>12年级、大一</td>
+                      <td>英国</td>
+                      <td>2023-09-01</td>
+                      <td><span style="color:var(--ant-primary); cursor:pointer;">编辑</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- 财务与订单汇总卡片 (映射真实订单测试数据) -->
+              <div class="trad-card">
+                <div class="trad-section-title">
+                  <span>订单与资金概况</span>
+                  <button class="ant-btn-link" onclick="openDrawer('course')">查看课时统计与课表流水 →</button>
+                </div>
+                <div class="trad-form-grid-4">
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">订单总应收：</span>
+                    <span id="tradOrderTotal" class="trad-form-val" style="font-weight:700; color:#111827;">¥1,077,629.60</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">已消耗金额：</span>
+                    <span id="tradOrderConsumed" class="trad-form-val" style="color:#0958d9;">¥828,054.62</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">未消耗金额：</span>
+                    <span id="tradOrderUnconsumed" class="trad-form-val" style="color:#389e0d; font-weight:600;">¥46,429.72</span>
+                  </div>
+                  <div class="trad-form-item">
+                    <span class="trad-form-label">退款/变更：</span>
+                    <span id="tradOrderRefund" class="trad-form-val" style="color:#cf1322;">¥203,145.26</span>
+                  </div>
+                </div>
+                <div style="margin-top:8px; font-size:12px; color:#8c8c8c;">
+                  资金池余额：<span id="tradOrderPool" style="color:#262626; font-weight:600;">¥407.66</span> ｜ 共签约 10 个国际课程与竞赛项目
+                </div>
+              </div>
+
+              <!-- 截图卡片 5：家庭信息折叠项 (100% 还原) -->
+              <div class="trad-card" style="padding:10px 18px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; cursor:pointer;" onclick="alert('展开家庭信息明细：家校信息1（国内家长联系中）')">
+                  <span style="font-size:13px; font-weight:600; color:#111827;">家庭信息（家校信息1）</span>
+                  <span style="color:#8c8c8c;">˅</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ================= TAB 2: 这次新做的【✨ AI 近况概览】全景卡片视口 ================= -->
+          <div id="wbPaneAi" class="tab-pane">
+            <div class="overview-grid-container">
+
+              <!-- 基本信息条 -->
+              <section class="card-basic-compact">
+                <div class="basic-compact-left">
+                  <div class="basic-name-tag">
+                    <span id="wbFullAiStuName">张翰涵</span>
+                    <span class="stage-badge-service">服务中</span>
+                  </div>
+                  <span style="color:#d1d5db;">|</span>
+                  <div class="compact-field">学校：<strong id="wbFullAiSchool">(UK) Headington School</strong></div>
+                  <span style="color:#d1d5db;">|</span>
+                  <div class="compact-field">年级：<strong id="wbFullAiGrade">大一</strong></div>
+                  <span style="color:#d1d5db;">|</span>
+                  <div class="compact-field compact-field-unmapped">服务团队：<strong id="wbFullAiTeam" style="font-weight:500; color:#8c8c8c;">待核实</strong></div>
+                </div>
+                <div>
+                  <button class="ant-btn-link" onclick="openDrawer('basic')">查看详情</button>
+                </div>
+              </section>
+
+              <!-- 总体近况 (2句话，约80字) -->
+              <section class="card-overall ai-accent">
+                <div class="overall-header-text">
+                  <span>✨ 总体近况（服务中模板 V1）</span>
+                </div>
+                <div id="wbFullAiOverallText" class="overall-body-text">
+                  现有资料显示，学生在<strong>9—10月有数学和化学课表安排（化学在读中、数学待开课）</strong>，升学申请已获<strong>爱丁堡大学与KCL录取</strong>。学情与沟通记录停留在<strong>5—6月</strong>，当前最新学习状态与家长反馈<strong>不足以判断</strong>。
+                </div>
+              </section>
+
+              <!-- 四个业务模块 (2x2 网格，去除状态标签) -->
+              <div class="four-modules-grid">
+                <article class="biz-module-card">
+                  <div class="biz-card-header">
+                    <div class="biz-card-title-group">
+                      <span class="biz-card-title">学习情况</span>
+                    </div>
+                    <button class="ant-btn-link" onclick="openDrawer('academic')">查看详情</button>
+                  </div>
+                  <div class="biz-card-body" id="wbFullAiAcademicBody">
+                    <p><strong>数学</strong>｜最近评价：2026-06-18（考前复盘完成），统计薄弱、力学稳定；历史模考：05-24 EDX 38分(E等第，历史预警)。</p>
+                    <p class="neutral-gray-note">化学：暂无近期随堂评价。</p>
+                  </div>
+                  <div class="biz-card-footer">
+                    <span>来源：授课反馈 (2026-06-18) · 模考报告 (2026-05-24)</span>
+                  </div>
+                </article>
+
+                <article class="biz-module-card">
+                  <div class="biz-card-header">
+                    <div class="biz-card-title-group">
+                      <span class="biz-card-title">升学与规划</span>
+                    </div>
+                    <button class="ant-btn-link" onclick="openDrawer('admission')">查看详情</button>
+                  </div>
+                  <div class="biz-card-body" id="wbFullAiAdmissionBody">
+                    <div class="line-row"><span class="line-label">申请结果：</span><span>2026秋 获 <strong>爱丁堡大学</strong>(Chemistry)、<strong>KCL</strong>(Chemistry)录取，<strong>UCL</strong>拒信；<span class="neutral-gray-note">录取条件及入读结果未提供</span></span></div>
+                    <div class="line-row"><span class="line-label">规划服务：</span><span>10年级规划服务记录为已完成（至 2026-06-30）</span></div>
+                    <div class="line-row"><span class="line-label">文书服务：</span><span>英国本科文书记录为未开始服务</span></div>
+                  </div>
+                  <div class="biz-card-footer">
+                    <span>来源：申请台账 · 规划系统 · 文书系统</span>
+                  </div>
+                </article>
+
+                <article class="biz-module-card">
+                  <div class="biz-card-header">
+                    <div class="biz-card-title-group">
+                      <span class="biz-card-title">课程与产品服务</span>
+                    </div>
+                    <button class="ant-btn-link" onclick="openDrawer('course')">查看详情</button>
+                  </div>
+                  <div class="biz-card-body" id="wbFullAiCourseBody">
+                    <div class="line-row"><span class="line-label">在读及待上：</span><span><strong>化学 1v1</strong>（09/05开课，每周在读）、<strong>数学 1v1 金牌</strong>（09/12待开课，已排课至10/18，9/27单日排课）</span></div>
+                    <div class="line-row"><span class="line-label">课时情况：</span><span>ALEVEL-1v1 已排未上 <strong>19.5 课时</strong> / 剩余未排 <strong>3.75 课时</strong>；金牌 已排未上 <strong>24 课时</strong> / 剩余未排 <strong>0.75 课时</strong></span></div>
+                  </div>
+                  <div class="biz-card-footer">
+                    <span>来源：学员课表流水 (共15条) · 签约产品订单</span>
+                  </div>
+                </article>
+
+                <article class="biz-module-card">
+                  <div class="biz-card-header">
+                    <div class="biz-card-title-group">
+                      <span class="biz-card-title">近期沟通与反馈</span>
+                    </div>
+                    <button class="ant-btn-link" onclick="openDrawer('communication')">查看详情</button>
+                  </div>
+                  <div class="biz-card-body" id="wbFullAiCommBody">
+                    <div class="line-row"><span class="line-label">学生沟通：</span><span>2026-06-28 电话访谈学生（人在英国，家长在国内），反馈状态波动、作业与模考表现不理想。</span></div>
+                    <div class="line-row"><span class="line-label">家长同步：</span><span>学管已向家长同步并进行预警；<span class="neutral-gray-note">未提供家长对预警的反馈及后续记录</span>。</span></div>
+                  </div>
+                  <div class="biz-card-footer">
+                    <span>来源：学管家校访谈记录 (累计38条)</span>
+                  </div>
+                </article>
+              </div>
+
+              <!-- 关注信息 -->
+              <section class="card-attention">
+                <div class="attention-card-header">
+                  <div class="attention-card-title">
+                    <span>⚠️ 关注信息（当前风险与信息缺口）</span>
+                  </div>
+                  <button class="ant-btn-link" onclick="openDrawer('attention')">查看详情与依据</button>
+                </div>
+                <div class="attention-card-body">
+                  <ul class="attention-items-list">
+                    <li class="attention-row">
+                      <span class="att-tag-chip risk">历史预警</span>
+                      <span class="att-content">数学存在历史目标达成预警（达到 B—A 目标有困难，预计大考C及以下），自06-18考前复盘后缺少后续大考与近期学情更新。</span>
+                      <span class="att-source-stamp">（2026-05-24 模考）</span>
+                    </li>
+                    <li class="attention-row">
+                      <span class="att-tag-chip gap">信息缺口</span>
+                      <span class="att-content">记录中存在客诉标签，但事件、原因、时间和处理状态未提供，无法判断严重程度及是否闭环。</span>
+                      <span class="att-source-stamp">（更新时间未提供）</span>
+                    </li>
+                    <li class="attention-row">
+                      <span class="att-tag-chip gap">资金关注</span>
+                      <span class="att-content">累计退款/变更金额达 ¥203,145.26，当前未消耗金额 ¥46,429.72，需结合秋季在读课程与课表安排关注消课节奏。</span>
+                      <span class="att-source-stamp">（财务订单台账）</span>
+                    </li>
+                  </ul>
+                </div>
+              </section>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ================= 统一 Ant Design 抽屉 ================= -->
+  <div id="drawerMask" class="drawer-overlay" onclick="if(event.target===this)closeDrawer()">
+    <div class="drawer-container">
+      <div class="drawer-header">
+        <div class="drawer-title-box">
+          <span id="drawerTitleText" class="drawer-title-text">模块详情</span>
+        </div>
+        <button class="drawer-close-btn" onclick="closeDrawer()" title="关闭 (Esc)">✕</button>
+      </div>
+      <div id="drawerScrollContent" class="drawer-body-scroll">
+        <!-- 动态注入抽屉富文本 -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ================= 全量真实学员数据库 (张翰涵测试数据完整装载) =================
+    const studentDB = {
+      "1000011527": {
+        id: "1000011527",
+        custId: "C0000082891",
+        name: "张翰涵",
+        gender: "男",
+        tier: "展金",
+        school: "(UK) Headington School",
+        grade: "大一",
+        phone: "138****2926",
+        campus: "唯寻上海/全上海",
+        complaintText: "客诉",
+        teamSummary: "顾问: 待核实 ｜ 学管: 待核实 ｜ 规划: 待核实",
+        eduHistory: [
+          { index: 1, status: "在读", school: "(UK) Headington School", grade: "12年级、大一", region: "英国", date: "2023-09-01" }
+        ],
+        finance: {
+          total: "¥1,077,629.60",
+          consumed: "¥828,054.62",
+          unconsumed: "¥46,429.72",
+          refund: "¥203,145.26",
+          pool: "¥407.66"
+        },
+        tags: {
+          warn: "客诉",
+          guides: ["近期学习波动", "作业需关注", "模考需关注", "已预警家长"],
+          tier: "展金",
+          lead: "唯寻上海/全上海"
+        },
+        overallText: "现有资料显示，学生在<strong>9—10月有数学和化学课表安排（化学在读中、数学待开课）</strong>，升学申请已获<strong>爱丁堡大学与KCL录取</strong>。学情与沟通记录停留在<strong>5—6月</strong>，当前最新学习状态与家长反馈<strong>不足以判断</strong>。",
+        factsSummaryHtml: `
+          <span class="embedded-fact-item">📚 <strong>学科重点</strong>：数学（06-18考前复盘）｜ 化学暂无近期评价</span>
+          <span class="embedded-fact-item">🎓 <strong>升学录取</strong>：爱丁堡大学、KCL (Offer) ｜ UCL拒信</span>
+          <span class="embedded-fact-item">📅 <strong>在读课表</strong>：化学 1v1 在读中 ｜ 数学金牌 09/12 开课</span>
+          <span class="embedded-fact-item">📞 <strong>家校沟通</strong>：06-28 电话访谈学生已预警 ｜ 38条累计</span>
+        `,
+        modules: {
+          academic: {
+            body: "<p><strong>数学</strong>｜最近评价：2026-06-18（考前复盘完成），统计薄弱、力学稳定；历史模考：05-24 EDX 38分(E等第，历史预警)。</p><p class=\"neutral-gray-note\">化学：暂无近期随堂评价。</p>",
+            drawerTitle: "学习情况明细及全量教学依据",
+            drawerHtml: `
+              <!-- 1. 模考报告 -->
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>📊 历史模考报告（2026-05-24｜ALEVEL数学-EDX）</span>
+                  <span class="status-tag-pill gold">历史记录</span>
+                </div>
+                <div class="drawer-desc-grid">
+                  <div class="dt">得分 / 满分</div><div class="dd"><strong>38.0 / 100.0</strong>（考试时长：120分钟）</div>
+                  <div class="dt">当前 / 目标等第</div><div class="dd"><strong style="color:#cf1322;">E 等第</strong> ｜ 目标等第：<strong>B-A</strong></div>
+                  <div class="dt">出分预警判定</div><div class="dd"><span style="color:#cf1322; font-weight:600;">⚠️ 需要预警</span>（预计大考成绩：C及以下）</div>
+                </div>
+
+                <div style="font-size:12px; font-weight:600; color:#374151; margin:8px 0 4px;">学情评估 11 项核心维度：</div>
+                <table class="drawer-desc-table">
+                  <thead><tr><th>评估维度</th><th style="width:50px;">评级</th><th>学员具体表现</th></tr></thead>
+                  <tbody>
+                    <tr><td>上课或课后提问</td><td><span class="status-tag-pill green">A</span></td><td>经常提问，态度非常积极</td></tr>
+                    <tr><td>阶段目标完成度</td><td><span class="status-tag-pill blue">B</span></td><td>略有欠缺</td></tr>
+                    <tr><td>课堂练习及作业正确率</td><td><span class="status-tag-pill blue">B</span></td><td>正确率一般，偶尔会有基本错误</td></tr>
+                    <tr><td>知识点记忆背诵</td><td><span class="status-tag-pill blue">B</span></td><td>记忆背诵有一些遗漏，基础过关</td></tr>
+                    <tr><td>知识点应用</td><td><span class="status-tag-pill blue">B</span></td><td>理解过关，可理解课堂教授的基本应用</td></tr>
+                    <tr><td>作业撰写完成度</td><td><span class="status-tag-pill blue">B</span></td><td>完成度中等，出现过未交迟交的情况</td></tr>
+                    <tr><td>其他相关学科表现</td><td><span class="status-tag-pill blue">B</span></td><td>表现一般，对本学科的学习有一些影响</td></tr>
+                    <tr><td>高阶知识点理解力</td><td><span class="status-tag-pill gold">C</span></td><td>掌握理解有一定困难，不适合竞赛的强度</td></tr>
+                    <tr><td>细心耐心</td><td><span class="status-tag-pill gold">C</span></td><td>经常因为粗心犯错，需要调整心态沉静下来学习</td></tr>
+                    <tr><td>刷题计划执行度</td><td><span class="status-tag-pill gold">C</span></td><td>进度较为落后，计划执行不到位</td></tr>
+                    <tr><td>非练习类任务完成度</td><td><span class="status-tag-pill gold">C</span></td><td>整理工作不到位，对知识点掌握有很大影响</td></tr>
+                  </tbody>
+                </table>
+
+                <div style="margin-top:10px; background:#f9fafb; border:1px solid #f0f0f0; border-radius:6px; padding:10px; font-size:12.5px; line-height:1.6;">
+                  <strong>老师复盘与分析：</strong><br />
+                  1. <strong>纯数 (Pure)</strong>：刚开始复习时校内 15/100 分。原细致知识点计划难度过高，改为通过 past paper 综合复习（一套卷子讲解约 10h），已完成 2-3 份讲解，后续巩固；<br />
+                  2. <strong>应用 (Applied)</strong>：mechanics + stats 已讲解 2 份真题，能拿 50% 左右分数，相对乐观；<br />
+                  3. <strong>失分与难度</strong>：计算/审题不仔细至少扣掉 20 分。老师认为数学要达 con A-B 存在困难但非完全不可能，当前学生精力、能力和准备时间不充分；<br />
+                  4. <strong>作业执行</strong>：每次课前基本完成 40%-50%，量无法再减少；课后提问一直很积极。
+                </div>
+              </div>
+
+              <!-- 2. 连续授课反馈流水 -->
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>📝 重点学科授课反馈流水（2026-06-14 ~ 06-18）</span>
+                </div>
+
+                <div class="feedback-log-card">
+                  <div class="feedback-log-top">
+                    <span class="feedback-log-date">2026-06-18 ｜ 考前最后练习 (Applied)</span>
+                    <span class="status-tag-pill blue">考前冲刺</span>
+                  </div>
+                  <div style="font-size:12px; color:#4b5563; line-height:1.5;">
+                    • <strong>授课内容</strong>：Probability、Correlation Analysis、Normal Distribution、Discrete Random Variable、Descriptive Statistics。<br />
+                    • <strong>教师建议</strong>：考前注意休息，力学成绩稳定，统计部分一直薄弱，考前多看笔记不用写新题。<br />
+                    • <strong>作业点评</strong>：布置了几题练习，<strong>没写</strong>。<br />
+                    • <strong>课堂表现</strong>：态度端正、上课积极。<strong>共性问题</strong>：背诵不足、练习不足、基础不好、未开摄像头。
+                  </div>
+                </div>
+
+                <div class="feedback-log-card">
+                  <div class="feedback-log-top">
+                    <span class="feedback-log-date">2026-06-17 ｜ Stats & Mechanics 综合</span>
+                    <span class="status-tag-pill gray">常规授课</span>
+                  </div>
+                  <div style="font-size:12px; color:#4b5563; line-height:1.5;">
+                    • <strong>授课内容</strong>：Normal distribution、Hypothesis testing、Large Data Set、Kinematics、Mechanics。<br />
+                    • <strong>教师建议</strong>：力学有 50%-60% 正确率，stats 忘得多在补。课后在群里提问相关内容，有进步。<br />
+                    • <strong>作业点评</strong>：布置的题目没写，但课后有复习笔记。<br />
+                    • <strong>课堂表现</strong>：态度端正、课后认真、上课积极。参与度 4/5。共性问题同上。
+                  </div>
+                </div>
+
+                <div class="feedback-log-card">
+                  <div class="feedback-log-top">
+                    <span class="feedback-log-date">2026-06-16 ｜ Stats 假设检验进阶</span>
+                    <span class="status-tag-pill gray">常规授课</span>
+                  </div>
+                  <div style="font-size:12px; color:#4b5563; line-height:1.5;">
+                    • <strong>授课内容</strong>：Binomial hypothesis testing、P-value、PMCC显著性检验、Normal分布应用。<br />
+                    • <strong>教师建议</strong>：假设检验理解有进步。布置的 2-3 道 stats 题目<strong>未完成</strong>。参与度 4/5，集中度 4/5。
+                  </div>
+                </div>
+
+                <div class="feedback-log-card">
+                  <div class="feedback-log-top">
+                    <span class="feedback-log-date">2026-06-14 ｜ Stats 基础定义复习</span>
+                    <span class="status-tag-pill gray">常规授课</span>
+                  </div>
+                  <div style="font-size:12px; color:#4b5563; line-height:1.5;">
+                    • <strong>授课内容</strong>：Binomial distribution、Normal approximation、Hypothesis testing、Regression line、PMCC。<br />
+                    • <strong>教师建议</strong>：前半截有精神，后半截较累。stats 忘得多。上次作业<strong>没写</strong>。
+                  </div>
+                </div>
+
+                <div style="background:#fffbe6; border:1px solid #ffe58f; padding:8px 10px; border-radius:4px; font-size:12px; color:#d48806; margin-top:6px;">
+                  ⚠️ <strong>学情缺口提示</strong>：06-18 考前复盘后，学生已参加大考，但系统内无后续大考出分记录及秋季学期开学评语；化学学科暂无学情评价录入。
+                </div>
+              </div>`
+          },
+          admission: {
+            body: "<div class=\"line-row\"><span class=\"line-label\">申请结果：</span><span>2026秋 获 <strong>爱丁堡大学</strong>(Chemistry)、<strong>KCL</strong>(Chemistry)录取，<strong>UCL</strong>拒信；<span class=\"neutral-gray-note\">录取条件及入读结果未提供</span></span></div><div class=\"line-row\"><span class=\"line-label\">规划服务：</span><span>10年级规划服务记录为已完成（至 2026-06-30）</span></div><div class=\"line-row\"><span class=\"line-label\">文书服务：</span><span>英国本科文书记录为未开始服务</span></div>",
+            drawerTitle: "升学申请台账与规划服务明细",
+            drawerHtml: `
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>🎓 申请院校与录取结果台账（2026秋季）</span>
+                  <span class="status-tag-pill green">递交人：王歆悦</span>
+                </div>
+                <table class="drawer-desc-table">
+                  <thead><tr><th>申请院校</th><th>专业 / 项目</th><th>专业方向</th><th>申请结果</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>The University of Edinburgh</strong><br /><span style="font-size:11px; color:#8c8c8c;">爱丁堡大学</span></td>
+                      <td>Chemistry</td>
+                      <td>化学</td>
+                      <td><span class="status-tag-pill green">Offer（录取）</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>King's College London (KCL)</strong><br /><span style="font-size:11px; color:#8c8c8c;">伦敦国王学院</span></td>
+                      <td>Chemistry</td>
+                      <td>Chemistry 化学</td>
+                      <td><span class="status-tag-pill green">Offer（录取）</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>UCL</strong><br /><span style="font-size:11px; color:#8c8c8c;">伦敦大学学院</span></td>
+                      <td>Science and Engineering for Social Change</td>
+                      <td>Engineering 工程 / Social and public policy 公共政策</td>
+                      <td><span class="status-tag-pill gray">拒信 (无需面试)</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>📋 升学规划与文书服务协议台账</span>
+                </div>
+                <div class="drawer-desc-grid">
+                  <div class="dt">升学规划服务</div><div class="dd"><strong>英联邦留学-10年级规划服务</strong>（购买 36 个月 / 已服务 36 个月 / 剩余 0 个月）</div>
+                  <div class="dt">服务状态</div><div class="dd"><span class="status-tag-pill blue">已完成服务</span>（区间：2023-07-01 至 2026-06-30，最新服务：2026-06-01）</div>
+                  <div class="dt">论文文书服务</div><div class="dd"><strong>英国本科文书</strong>（报名时间：2023-03-28 18:11:44）</div>
+                  <div class="dt">文书状态</div><div class="dd"><span class="status-tag-pill gray">未开始服务</span></div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:4px; padding:8px 10px; font-size:12px; color:#64748b;">
+                  ℹ️ <strong>信息边界说明</strong>：现有台账中，爱丁堡与 KCL 的具体录取条件（Conditional Offer 的 Con 分要求）及学生最终确定入读结果未提供。
+                </div>
+              </div>`
+          },
+          course: {
+            body: "<div class=\"line-row\"><span class=\"line-label\">在读及待上：</span><span><strong>化学 1v1</strong>（09/05开课，每周在读）、<strong>数学 1v1 金牌</strong>（09/12待开课，已排课至10/18，9/27单日排课）</span></div><div class=\"line-row\"><span class=\"line-label\">课时情况：</span><span>ALEVEL-1v1 已排未上 <strong>19.5 课时</strong> / 剩余未排 <strong>3.75 课时</strong>；金牌 已排未上 <strong>24 课时</strong> / 剩余未排 <strong>0.75 课时</strong></span></div>",
+            drawerTitle: "财务订单、国际课程签约与15条学员课表记录",
+            drawerHtml: `
+              <!-- 财务汇总 -->
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>💰 资金与订单台账汇总</span>
+                </div>
+                <div class="drawer-desc-grid">
+                  <div class="dt">订单总应收</div><div class="dd"><strong>¥1,077,629.60</strong></div>
+                  <div class="dt">已消耗金额</div><div class="dd"><strong style="color:#0958d9;">¥828,054.62</strong></div>
+                  <div class="dt">未消耗金额</div><div class="dd"><strong style="color:#389e0d;">¥46,429.72</strong></div>
+                  <div class="dt">退款 / 变更金额</div><div class="dd"><strong style="color:#cf1322;">¥203,145.26</strong>（高阶竞赛与ALEVEL退课）</div>
+                  <div class="dt">资金池余额</div><div class="dd"><strong>¥407.66</strong></div>
+                </div>
+              </div>
+
+              <!-- 10 项签约产品明细 -->
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>📦 10 项签约国际课程与竞赛产品明细</span>
+                </div>
+                <table class="drawer-desc-table">
+                  <thead><tr><th>产品名称</th><th>购买课时</th><th>已上课时</th><th>已排未上</th><th>未排剩余</th><th>退课课时</th></tr></thead>
+                  <tbody>
+                    <tr><td>英联邦学科-ALEVEL-1v1</td><td>437.5</td><td>311.75</td><td>19.5</td><td>3.75</td><td>102.5</td></tr>
+                    <tr><td>英联邦学科-ALEVEL-1v1金牌</td><td>270</td><td>202.25</td><td>24</td><td>0.75</td><td>43</td></tr>
+                    <tr><td>择校备考-择校初升高-1v1</td><td>104</td><td>92</td><td>-</td><td>-</td><td>12</td></tr>
+                    <tr><td>英联邦学科-GCSE-1v1</td><td>120</td><td>100.5</td><td>-</td><td>-</td><td>19.5</td></tr>
+                    <tr><td>英联邦语培-雅思-1v12金牌</td><td>70</td><td>70</td><td>-</td><td>-</td><td>0</td></tr>
+                    <tr><td>高阶竞赛-高阶竞赛-1v1</td><td>43.5</td><td>34</td><td>-</td><td>-</td><td>9.5</td></tr>
+                    <tr><td>英联邦学科-学竞-1v8</td><td>34</td><td>34</td><td>-</td><td>-</td><td>0</td></tr>
+                    <tr><td>高阶竞赛-中阶竞赛-1v1</td><td>30</td><td>17</td><td>-</td><td>-</td><td>13</td></tr>
+                    <tr><td>高阶竞赛-中阶竞赛-1v8</td><td>24</td><td>0</td><td>-</td><td>-</td><td>24</td></tr>
+                    <tr><td>英联邦学科-GCSE-1v1</td><td>3</td><td>3</td><td>-</td><td>-</td><td>0</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- 15 条班级排期 -->
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>📅 15 条班级排课与上课记录（包含当前在读与历史结课）</span>
+                </div>
+                <table class="drawer-desc-table">
+                  <thead><tr><th>开课 ~ 结课日期</th><th>班级名称</th><th style="width:65px;">排课课时</th><th>上课状态</th></tr></thead>
+                  <tbody>
+                    <tr style="background:#e6f4ff;"><td>2026/09/27 ~ 09/27</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1金牌</td><td>1.5</td><td><span class="status-tag-pill blue">待开课</span></td></tr>
+                    <tr style="background:#e6f4ff;"><td>2026/09/12 ~ 10/18</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1金牌</td><td>9</td><td><span class="status-tag-pill blue">待开课</span></td></tr>
+                    <tr style="background:#f6ffed;"><td>2026/09/05 ~ 10/31</td><td>张翰涵-英联邦学科-ALEVEL-化学-1v1</td><td>13.5</td><td><span class="status-tag-pill green">在读中</span></td></tr>
+                    <tr><td>2026/08/06 ~ 08/31</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1金牌</td><td>15</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/08/04 ~ 08/29</td><td>张翰涵-英联邦学科-ALEVEL-化学-1v1</td><td>9</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/06/18 ~ 06/18</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1金牌</td><td>2</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/06/16 ~ 06/16</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1金牌</td><td>2</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/06/13 ~ 06/13</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1</td><td>2</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/06/11 ~ 06/11</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1金牌</td><td>1.5</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/06/09 ~ 06/10</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1金牌</td><td>3</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/06/03 ~ 06/03</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1金牌</td><td>2</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/05/30 ~ 05/31</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1金牌</td><td>3</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/05/24 ~ 06/17</td><td>张翰涵-英联邦学科-ALEVEL-数学-1v1金牌</td><td>8.25</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/05/22 ~ 05/23</td><td>张翰涵-英联邦学科-ALEVEL-化学-1v1金牌</td><td>2</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                    <tr><td>2026/05/18 ~ 05/18</td><td>张翰涵-英联邦学科-ALEVEL-物理-1v1金牌</td><td>1.5</td><td><span class="status-tag-pill gray">已结课</span></td></tr>
+                  </tbody>
+                </table>
+              </div>`
+          },
+          communication: {
+            body: "<div class=\"line-row\"><span class=\"line-label\">学生沟通：</span><span>2026-06-28 电话访谈学生（人在英国，家长在国内），反馈状态波动、作业与模考表现不理想。</span></div><div class=\"line-row\"><span class=\"line-label\">家长同步：</span><span>学管已向家长同步并进行预警；<span class=\"neutral-gray-note\">未提供家长对预警的反馈及后续记录</span>。</span></div>",
+            drawerTitle: "学管访谈流水与家校沟通详情",
+            drawerHtml: `
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>📞 最近一次学管访谈纪要（2026-06-28）</span>
+                  <span class="status-tag-pill blue">累计访谈：38 条</span>
+                </div>
+                <div class="drawer-desc-grid">
+                  <div class="dt">访谈时间 / 方式</div><div class="dd"><strong>2026-06-28</strong> ｜ 电话访谈</div>
+                  <div class="dt">访谈对象</div><div class="dd">张翰涵（学生目前在英国，家长在国内）</div>
+                  <div class="dt">学生反馈事实</div><div class="dd">学生近期状态存在一定波动，课后作业和模考表现不够理想。</div>
+                  <div class="dt">学管同步事实</div><div class="dd">已通过面聊及文字方式向家长同步学生学习情况，并已针对学习情况向家长进行预警。</div>
+                </div>
+              </div>
+
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>🗓️ 近期连续学管访谈时间轴</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px; font-size:12.5px;">
+                  <div style="display:flex; gap:10px;"><strong style="width:90px;">2026-06-28</strong><span>电话访谈张翰涵，同步学习波动并进行预警</span></div>
+                  <div style="display:flex; gap:10px;"><strong style="width:90px;">2026-05-23</strong><span>常规阶段访谈，跟进模考前准备</span></div>
+                  <div style="display:flex; gap:10px;"><strong style="width:90px;">2026-04-23</strong><span>月度学情跟进与排课计划确认</span></div>
+                  <div style="display:flex; gap:10px;"><strong style="width:90px;">2026-03-30</strong><span>春季选课与大考复习节奏规划</span></div>
+                  <div style="display:flex; gap:10px;"><strong style="width:90px;">2026-02-03</strong><span>寒假备考与作业督导访谈</span></div>
+                  <div style="display:flex; gap:10px;"><strong style="width:90px;">2026-01-26</strong><span>学期初常规家校沟通</span></div>
+                </div>
+
+                <div style="background:#fffbe6; border:1px solid #ffe58f; padding:8px 10px; border-radius:4px; font-size:12px; color:#d48806; margin-top:12px;">
+                  ⚠️ <strong>信息缺口提示</strong>：06-28 学管发出预警后，台账中未记录家长对此预警的具体反馈与回执，且 7—8 月缺少进一步跟进记录。
+                </div>
+              </div>`
+          },
+          attention: {
+            drawerTitle: "关注事实与关键缺口依据",
+            drawerHtml: `
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>1. 历史模考达成预警（2026-05-24 ALEVEL数学）</span>
+                  <span class="status-tag-pill gold">历史记录</span>
+                </div>
+                <div style="font-size:12.5px; line-height:1.6; color:#374151;">
+                  • <strong>事实依据</strong>：2026-05-24 EDX 模考得分 38/100，E 等第。任课教师评定“达到 B-A 目标存在困难”，出具出分预警，预计大考成绩 C 及以下。<br />
+                  • <strong>缺口边界</strong>：06-18 完成最后冲刺练习后已参加大考，但现有系统无最终大考成绩，且当前 9 月缺少随堂学情更新，该历史预警对新学期的适用性待确认。
+                </div>
+              </div>
+
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>2. 客诉标签未闭环记录</span>
+                  <span class="status-tag-pill gold">信息缺口</span>
+                </div>
+                <div style="font-size:12.5px; line-height:1.6; color:#374151;">
+                  • <strong>事实依据</strong>：学员标签中存在警示类标签“客诉”。<br />
+                  • <strong>缺口边界</strong>：客诉发生的时间、具体诉求原因、责任人及处理状态未在系统中载入，无法判断严重程度与是否已解决。
+                </div>
+              </div>
+
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">
+                  <span>3. 累计退款/变更与资金消课关注</span>
+                  <span class="status-tag-pill gold">资金台账</span>
+                </div>
+                <div style="font-size:12.5px; line-height:1.6; color:#374151;">
+                  • <strong>事实依据</strong>：财务台账显示累计退款/变更金额达 ¥203,145.26，涉及高阶竞赛与 ALEVEL 课程退转课；当前未消耗金额 ¥46,429.72。<br />
+                  • <strong>业务建议</strong>：需密切结合秋季在读课程与课表安排关注消课节奏。
+                </div>
+              </div>`
+          },
+          basic: {
+            drawerTitle: "基本信息核验及服务团队映射",
+            drawerHtml: `
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">基本信息核验</div>
+                <div class="drawer-desc-grid">
+                  <div class="dt">客户编号</div><div class="dd">C0000082891</div>
+                  <div class="dt">学员编号</div><div class="dd">1000011527</div>
+                  <div class="dt">学员姓名</div><div class="dd">张翰涵（男）</div>
+                  <div class="dt">在读学校</div><div class="dd">(UK) Headington School</div>
+                  <div class="dt">在读年级</div><div class="dd">大一</div>
+                  <div class="dt">归属学校</div><div class="dd">唯寻上海/全上海</div>
+                  <div class="dt">教育经历</div><div class="dd">12年级、大一 (UK) Headington School</div>
+                  <div class="dt">服务团队</div><div class="dd"><span style="color:#cf1322;">顾问、学管、升学规划师未明确映射（待核实）</span></div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:4px; padding:8px 10px; font-size:12px; color:#64748b; margin-top:8px;">
+                  学校登记为英国高中（Headington School），年级登记为大一，按规范分列展示，不自行解释教育阶段。
+                </div>
+              </div>`
+          },
+          all_evidence: {
+            drawerTitle: "服务中学生概览全流程证据归档",
+            drawerHtml: `
+              <div class="drawer-sec-block">
+                <div class="drawer-sec-heading">数据基准信息</div>
+                <div class="drawer-desc-grid">
+                  <div class="dt">概览基准日期</div><div class="dd"><strong>2026-09-07</strong></div>
+                  <div class="dt">系统生成时间</div><div class="dd">2026-09-07 10:30:15</div>
+                  <div class="dt">数据来源</div><div class="dd">模考系统 (05-24) · 授课系统 (06-18) · 申请台账 (2026秋) · 财务订单 · 学管访谈 (06-28)</div>
+                </div>
+              </div>`
+          }
+        }
+      },
+      "C0000109842": {
+        id: "C0000109842",
+        custId: "C0000109842",
+        name: "陈芊含",
+        gender: "女",
+        tier: "黑金",
+        school: "浦华曜ONE",
+        grade: "12年级",
+        phone: "138****2926",
+        campus: "上海校区",
+        complaintText: "客诉",
+        teamSummary: "学管: 戚兴玲 ｜ 规划: 魏蓉",
+        eduHistory: [
+          { index: 1, status: "在读", school: "浦华曜ONE", grade: "12年级", region: "上海", date: "2024-09-01" }
+        ],
+        finance: {
+          total: "¥380,000.00",
+          consumed: "¥210,000.00",
+          unconsumed: "¥170,000.00",
+          refund: "¥0.00",
+          pool: "¥0.00"
+        },
+        tags: {
+          warn: "客诉",
+          guides: ["OS", "唯高三"],
+          tier: "黑金",
+          lead: "泛指"
+        },
+        overallText: "学生处于<strong>12年级升学申请关键期</strong>，已签约展金商品与OS指导。当前<strong>化学与督学课正常上课中</strong>，<strong>客诉标记已进入教务复核阶段</strong>。",
+        factsSummaryHtml: `
+          <span class="embedded-fact-item">📚 <strong>学科重点</strong>：高二期末成绩已归档，整体表现平稳</span>
+          <span class="embedded-fact-item">🎓 <strong>升学规划</strong>：意向英国商科/经济方向，文书准备中</span>
+          <span class="embedded-fact-item">📅 <strong>在读课表</strong>：督学课正常上课中 ｜ 本周计划2次</span>
+          <span class="embedded-fact-item">📞 <strong>家校沟通</strong>：09-03 学管已同步选课与升学时间轴</span>
+        `,
+        modules: {
+          academic: {
+            body: "<p>高二期末成绩已录入，近期督学课反馈待更新；当前缺少开学后近期随堂小测明细。</p>",
+            drawerTitle: "学习情况详情及依据",
+            drawerHtml: `<div class="drawer-sec-block"><div class="drawer-sec-heading">高二期末成绩已归档，整体表现平稳。</div></div>`
+          },
+          admission: {
+            body: "<div class=\"line-row\"><span class=\"line-label\">申请意向：</span><span>意向英国商科/经济方向，正在梳理文书与背景活动材料。</span></div>",
+            drawerTitle: "升学申请详情",
+            drawerHtml: `<div class="drawer-sec-block">意向英国商科，魏蓉老师负责。</div>`
+          },
+          course: {
+            body: "<div class=\"line-row\"><span class=\"line-label\">在读课表：</span><span>本周有督导课上课安排，常规在读课时充足。</span></div>",
+            drawerTitle: "课表与上课明细",
+            drawerHtml: `<div class="drawer-sec-block">课表正常，本周计划督导课 2 次。</div>`
+          },
+          communication: {
+            body: "<div class=\"line-row\"><span class=\"line-label\">家校沟通：</span><span>09-03 戚老师向家长同步本学期选课与升学时间轴，家长已确认。</span></div>",
+            drawerTitle: "沟通记录",
+            drawerHtml: `<div class="drawer-sec-block">专属学管戚兴玲沟通。</div>`
+          },
+          attention: {
+            drawerTitle: "关注事实",
+            drawerHtml: `<div class="drawer-sec-block">教学主管已介入沟通核实客诉标签。</div>`
+          },
+          basic: {
+            drawerTitle: "基本信息",
+            drawerHtml: `<div class="drawer-sec-block">截图原生学员数据。</div>`
+          },
+          all_evidence: {
+            drawerTitle: "全流程依据",
+            drawerHtml: `<div class="drawer-sec-block">基准日期 2026-09-07。</div>`
+          }
+        }
+      },
+      "1000012891": {
+        id: "1000012891",
+        custId: "C0000088219",
+        name: "李思睿",
+        gender: "女",
+        tier: "展金",
+        school: "上海市世外中学",
+        grade: "11年级",
+        phone: "139****5512",
+        campus: "徐汇校区",
+        complaintText: "无客诉",
+        teamSummary: "顾问: 王琴 ｜ 班主任: 周浩 ｜ 规划: 陈立",
+        eduHistory: [{ index: 1, status: "在读", school: "上海市世外中学", grade: "11年级", region: "上海", date: "2024-09-01" }],
+        finance: { total: "¥450,000.00", consumed: "¥280,000.00", unconsumed: "¥170,000.00", refund: "¥0.00", pool: "¥0.00" },
+        tags: { warn: "正常", guides: ["物理A*", "自驱型"], tier: "展金", lead: "徐汇直访" },
+        overallText: "学生在<strong>9月正常接受物理与经济 1v1 课程</strong>，近期模考达到 <strong>A* 目标分</strong>；升学规划已完成选校清单初拟，各方反馈平稳有序。",
+        factsSummaryHtml: `
+          <span class="embedded-fact-item">📚 <strong>学科重点</strong>：物理电磁学大题正确率92%</span>
+          <span class="embedded-fact-item">🎓 <strong>升学规划</strong>：方案初拟牛津物理、帝国理工工程</span>
+          <span class="embedded-fact-item">📅 <strong>在读课表</strong>：物理 1v1 课表安排至 11-15</span>
+          <span class="embedded-fact-item">📞 <strong>家校沟通</strong>：09-01 家长认可开学排课</span>
+        `,
+        modules: {
+          academic: { body: "物理最新：电磁学大题正确率 92%，解题思路清晰。" },
+          admission: { body: "选校方案初拟牛津大学物理、帝国理工工程科学。" },
+          course: { body: "物理 1v1 课表已安排至 11-15，剩余未排 12 课时。" },
+          communication: { body: "09-01 微信沟通家长，家长认可开学排课安排。" },
+          attention: { drawerTitle: "关注事实", drawerHtml: "暂无阻碍判断的明显缺口。" },
+          basic: { drawerTitle: "基本信息", drawerHtml: "全字段吻合一致。" },
+          all_evidence: { drawerTitle: "全流程依据", drawerHtml: "数据已同步至 2026-09-07。" }
+        }
+      },
+      "1000010443": {
+        id: "1000010443",
+        custId: "C0000077391",
+        name: "王泽宇",
+        gender: "男",
+        tier: "黑金",
+        school: "北京十一学校",
+        grade: "12年级",
+        phone: "136****8890",
+        campus: "北京校区",
+        complaintText: "无客诉",
+        teamSummary: "待补齐",
+        eduHistory: [{ index: 1, status: "在读", school: "北京十一学校", grade: "12年级", region: "北京", date: "2023-09-01" }],
+        finance: { total: "¥520,000.00", consumed: "¥520,000.00", unconsumed: "¥0.00", refund: "¥0.00", pool: "¥0.00" },
+        tags: { warn: "正常", guides: ["文书冲刺", "STEP2"], tier: "黑金", lead: "北京渠道" },
+        overallText: "学生正处于<strong>文书冲刺与STEP备考</strong>关键期，暂无新增常规课表。上周<strong>家长反映文书初稿修改偏慢</strong>，正由规划师跟进。",
+        factsSummaryHtml: `
+          <span class="embedded-fact-item">📚 <strong>学科重点</strong>：数学STEP真题训练中</span>
+          <span class="embedded-fact-item">🎓 <strong>升学规划</strong>：主PS第三稿修改中（剑桥数学）</span>
+          <span class="embedded-fact-item">📅 <strong>课时情况</strong>：课时已消耗完毕，暂无在读课表</span>
+          <span class="embedded-fact-item">📞 <strong>家校沟通</strong>：09-04 家长要求加速文书定稿</span>
+        `,
+        modules: {
+          academic: { body: "数学STEP真题训练中，最近未录入小测得分。" },
+          admission: { body: "主PS第三稿修改中，剑桥数学方向。" },
+          course: { body: "课时已消耗完毕，暂无待上课表。" },
+          communication: { body: "09-04 家长提出要求加速文书定稿节奏。" },
+          attention: { drawerTitle: "关注事实", drawerHtml: "文书进度需本周闭环。" },
+          basic: { drawerTitle: "基本信息", drawerHtml: "班主任交接中。" },
+          all_evidence: { drawerTitle: "全量依据", drawerHtml: "基准日期 2026-09-07。" }
+        }
+      }
+    };
+
+    let currentStudentId = "1000011527"; // 默认加载真实测试学员：张翰涵
+    let currentViewMode = "workbench";    // 默认展示复原的截图形态
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderAiRosterList();
+      applyStudentData(currentStudentId);
+    });
+
+    // ================= 形态切换 =================
+    function switchViewMode(mode) {
+      currentViewMode = mode;
+      const btnAI = document.getElementById("btnModeAI");
+      const btnWB = document.getElementById("btnModeWorkbench");
+      const viewAI = document.getElementById("viewAI");
+      const viewWB = document.getElementById("viewWorkbench");
+
+      if (mode === "ai") {
+        btnAI.classList.add("active");
+        btnWB.classList.remove("active");
+        viewAI.style.display = "flex";
+        viewWB.style.display = "none";
+      } else {
+        btnWB.classList.add("active");
+        btnAI.classList.remove("active");
+        viewWB.style.display = "flex";
+        viewAI.style.display = "none";
+      }
+    }
+
+    // ================= 形式二：班主任工作台 Tab 切换 =================
+    function switchWorkbenchTab(tabKey) {
+      const btnBasic = document.getElementById("wbTabBtnBasic");
+      const btnAi = document.getElementById("wbTabBtnAi");
+      const paneBasic = document.getElementById("wbPaneBasic");
+      const paneAi = document.getElementById("wbPaneAi");
+
+      if (tabKey === "ai") {
+        btnAi.classList.add("active");
+        btnBasic.classList.remove("active");
+        paneAi.classList.add("active");
+        paneBasic.classList.remove("active");
+      } else {
+        btnBasic.classList.add("active");
+        btnAi.classList.remove("active");
+        paneBasic.classList.add("active");
+        paneAi.classList.remove("active");
+      }
+    }
+
+    // ================= 形式一：学员侧栏渲染与搜索 =================
+    function renderAiRosterList(filterKeyword = "") {
+      const rosterListEl = document.getElementById("aiRosterList");
+      rosterListEl.innerHTML = "";
+
+      Object.values(studentDB).forEach(stu => {
+        if (filterKeyword) {
+          const kw = filterKeyword.toLowerCase();
+          const match = stu.name.toLowerCase().includes(kw) ||
+                        stu.id.toLowerCase().includes(kw) ||
+                        stu.school.toLowerCase().includes(kw);
+          if (!match) return;
+        }
+
+        const item = document.createElement("div");
+        item.className = "roster-item" + (stu.id === currentStudentId ? " active" : "");
+        item.onclick = () => selectStudent(stu.id);
+
+        item.innerHTML = `
+          <div class="roster-item-header">
+            <span class="roster-item-name">${stu.name}</span>
+            <span class="roster-item-id">${stu.id}</span>
+          </div>
+          <div class="roster-item-school">${stu.school} · ${stu.grade}</div>
+          <div class="roster-item-tags">
+            <span class="mini-tag">${stu.tier}</span>
+            ${stu.complaintText && stu.complaintText !== "无客诉" ? `<span class="mini-tag warn">${stu.complaintText}</span>` : ''}
+            <span class="mini-tag">${stu.grade}</span>
+          </div>
+        `;
+        rosterListEl.appendChild(item);
+      });
+    }
+
+    function handleRosterSearch(val) {
+      renderAiRosterList(val.trim());
+    }
+
+    function toggleAiRoster(collapse) {
+      const sb = document.getElementById("aiRosterSidebar");
+      if (collapse !== undefined) {
+        if (collapse) sb.classList.add("collapsed");
+        else sb.classList.remove("collapsed");
+      } else {
+        sb.classList.toggle("collapsed");
+      }
+    }
+
+    // ================= 学员切换器 =================
+    function selectStudent(stuId) {
+      currentStudentId = stuId;
+      applyStudentData(stuId);
+      renderAiRosterList();
+
+      const sel = document.querySelector(".stu-switcher-select");
+      if (sel) sel.value = stuId;
+    }
+
+    function applyStudentData(stuId) {
+      const stu = studentDB[stuId] || studentDB["1000011527"];
+
+      // 1. 形式一字段
+      document.getElementById("aiStuName").innerText = stu.name;
+      document.getElementById("aiStuSchool").innerText = stu.school;
+      document.getElementById("aiStuGrade").innerText = stu.grade;
+      document.getElementById("aiStuTeam").innerText = stu.teamSummary;
+      document.getElementById("aiOverallText").innerHTML = stu.overallText;
+
+      document.getElementById("aiAcademicBody").innerHTML = stu.modules.academic.body || "";
+      document.getElementById("aiAdmissionBody").innerHTML = stu.modules.admission.body || "";
+      document.getElementById("aiCourseBody").innerHTML = stu.modules.course.body || "";
+
+      if (stu.modules.communication) {
+        document.getElementById("aiCommBody").innerHTML = stu.modules.communication.body || "";
+      }
+
+      // 2. 形式二：班主任工作台字段 (截图同款)
+      document.getElementById("wbHeaderTier").innerText = stu.tier || "展金";
+      document.getElementById("wbHeaderStuName").innerText = stu.name + "(" + stu.id + ")";
+      document.getElementById("wbHeaderPhone").innerText = stu.phone;
+      
+      const tagComp = document.getElementById("wbHeaderComplaintTag");
+      if (stu.complaintText && stu.complaintText !== "无客诉") {
+        tagComp.style.display = "inline-block";
+        tagComp.innerText = stu.complaintText;
+      } else {
+        tagComp.style.display = "none";
+      }
+
+      // 形式二基本信息顶部的 AI 近况速览卡
+      document.getElementById("wbEmbeddedOverallText").innerHTML = stu.overallText;
+      const factsRow = document.getElementById("wbEmbeddedFactsRow");
+      if (factsRow && stu.factsSummaryHtml) {
+        factsRow.innerHTML = stu.factsSummaryHtml;
+      }
+
+      // 形式二传统卡片字段
+      document.getElementById("tradCardWarnTag").innerText = stu.tags.warn || "正常";
+      document.getElementById("tradCardTierTag").innerText = stu.tier || "展金";
+      document.getElementById("tradCustId").innerText = stu.custId || stu.id;
+      document.getElementById("tradStuId").innerText = stu.id;
+      document.getElementById("tradStuName").innerText = stu.name;
+      document.getElementById("tradGender").innerText = stu.gender || "男";
+      document.getElementById("tradSchool").innerText = stu.school;
+      document.getElementById("tradGrade").innerText = stu.grade + " ℹ️";
+      document.getElementById("tradCampus").innerText = stu.campus || "唯寻上海/全上海";
+      document.getElementById("tradPhone").innerText = stu.phone;
+
+      // 指导类标签渲染
+      const guideContainer = document.getElementById("tradCardGuideTags");
+      if (guideContainer && stu.tags && stu.tags.guides) {
+        guideContainer.innerHTML = stu.tags.guides.map(g => `<span class="mini-tag" style="background:#e6f4ff; color:#0958d9; border:1px solid #91caff;">${g}</span>`).join("");
+      }
+
+      // 线索类标签
+      const leadEl = document.getElementById("tradCardLeadTag");
+      if (leadEl && stu.tags) {
+        leadEl.innerText = stu.tags.lead || stu.campus;
+      }
+
+      // 教育经历表格
+      const eduTbody = document.getElementById("tradEduTbody");
+      if (eduTbody && stu.eduHistory) {
+        eduTbody.innerHTML = stu.eduHistory.map(e => `
+          <tr>
+            <td>${e.index}</td>
+            <td><span class="status-tag-pill green">${e.status}</span></td>
+            <td>${e.school}</td>
+            <td>${e.grade}</td>
+            <td>${e.region}</td>
+            <td>${e.date}</td>
+            <td><span style="color:var(--ant-primary); cursor:pointer;">编辑</span></td>
+          </tr>
+        `).join("");
+      }
+
+      // 财务卡片
+      if (stu.finance) {
+        document.getElementById("tradOrderTotal").innerText = stu.finance.total;
+        document.getElementById("tradOrderConsumed").innerText = stu.finance.consumed;
+        document.getElementById("tradOrderUnconsumed").innerText = stu.finance.unconsumed;
+        document.getElementById("tradOrderRefund").innerText = stu.finance.refund;
+        document.getElementById("tradOrderPool").innerText = stu.finance.pool;
+      }
+
+      // 形式二全景 AI Tab 字段
+      document.getElementById("wbFullAiStuName").innerText = stu.name;
+      document.getElementById("wbFullAiSchool").innerText = stu.school;
+      document.getElementById("wbFullAiGrade").innerText = stu.grade;
+      document.getElementById("wbFullAiTeam").innerText = stu.teamSummary;
+      document.getElementById("wbFullAiOverallText").innerHTML = stu.overallText;
+
+      document.getElementById("wbFullAiAcademicBody").innerHTML = stu.modules.academic.body || "";
+      document.getElementById("wbFullAiAdmissionBody").innerHTML = stu.modules.admission.body || "";
+      document.getElementById("wbFullAiCourseBody").innerHTML = stu.modules.course.body || "";
+
+      if (stu.modules.communication) {
+        document.getElementById("wbFullAiCommBody").innerHTML = stu.modules.communication.body || "";
+      }
+    }
+
+    // ================= 抽屉逻辑 =================
+    function openDrawer(moduleKey) {
+      const stu = studentDB[currentStudentId] || studentDB["1000011527"];
+      const mod = stu.modules[moduleKey] || stu.modules.academic;
+
+      document.getElementById("drawerTitleText").innerText = mod.drawerTitle || "模块详情";
+      document.getElementById("drawerScrollContent").innerHTML = mod.drawerHtml || "<p>暂无更多明细。</p>";
+
+      document.getElementById("drawerMask").classList.add("open");
+    }
+
+    function closeDrawer() {
+      document.getElementById("drawerMask").classList.remove("open");
+    }
+
+    function copyMarkdownSummary() {
+      const stu = studentDB[currentStudentId] || studentDB["1000011527"];
+      const text = "### 服务中学生概览：" + stu.name + " (" + stu.id + ")\n" +
+        "基准日期：2026-09-07 ｜ 生成时间：2026-09-07 10:30\n" +
+        "在读学校：" + stu.school + " ｜ 年级：" + stu.grade + " ｜ 服务团队：" + stu.teamSummary + "\n\n" +
+        "【总体近况】\n" + stu.overallText.replace(/<\/?[^>]+(>|$)/g, "") + "\n\n" +
+        "【业务事实摘要】\n" +
+        "- 学习情况：数学06-18考前复盘，化学暂无近期评价\n" +
+        "- 升学规划：获爱丁堡与KCL录取，UCL拒信\n" +
+        "- 课程服务：化学在读中、数学待开课\n" +
+        (stu.modules.communication ? "- 近期沟通：06-28电话访谈学生已预警\n" : "");
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert("已成功复制【服务中学生概览】Markdown 到剪贴板！");
+      }).catch(() => {
+        alert("复制成功！");
+      });
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDrawer();
+    });
+  </script>
+</body>
+</html>

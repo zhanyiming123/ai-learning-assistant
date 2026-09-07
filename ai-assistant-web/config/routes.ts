@@ -54,6 +54,22 @@ export default [
     ],
   },
   {
+    path: "/learning",
+    name: "learning",
+    icon: "read",
+    routes: [
+      {
+        path: "/learning",
+        redirect: "/learning/students",
+      },
+      {
+        path: "/learning/students",
+        name: "students",
+        component: "./Learning/Students",
+      },
+    ],
+  },
+  {
     path: "/ai-config",
     name: "aiConfig",
     icon: "setting",

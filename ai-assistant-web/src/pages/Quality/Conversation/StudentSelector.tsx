@@ -81,7 +81,6 @@ export function useRiskStudentSelection(
   initialFilters?: AdvancedFilters,
 ) {
   const [filters, setFiltersState] = useState<AdvancedFilters>(() => ({
-    eventTime: getDefaultEventTime(),
     ...initialFilters,
   }));
   const [progress, setProgressState] =
@@ -197,7 +196,6 @@ export function StudentQueryBar({ selection }: StudentQueryBarProps) {
         span={{ xs: 24, sm: 12, md: 8, lg: 6, xl: 6, xxl: 4 }}
         searchGutter={[16, 8]}
         dateFormatter="string"
-        initialValues={{ eventTime: getDefaultEventTime() }}
         searchText="查询"
         resetText="重置"
         onFinish={async (values) => {
@@ -208,7 +206,7 @@ export function StudentQueryBar({ selection }: StudentQueryBarProps) {
           return true;
         }}
         onReset={() => {
-          selection.applyFilters({ eventTime: getDefaultEventTime() });
+          selection.applyFilters({});
         }}
       >
         <ProFormText

@@ -6,7 +6,7 @@ import {
   within,
 } from "@testing-library/react";
 import { useState } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   getLinkedRiskStudentFilters,
   StudentQueryBar,
@@ -26,7 +26,6 @@ function StudentSelectorHarness() {
     riskStudents,
     selectedStudentId,
     setSelectedStudentId,
-    { eventTime: ["2026-08-01", "2026-08-31"] },
   );
 
   return (
@@ -42,8 +41,6 @@ function StudentSelectorHarness() {
 }
 
 describe("StudentSelector", () => {
-  beforeEach(() => vi.setSystemTime(new Date("2026-08-10T12:00:00+08:00")));
-  afterEach(() => vi.useRealTimers());
   it("默认展示待处理学生并展示分组数量", async () => {
     render(<StudentSelectorHarness />);
 

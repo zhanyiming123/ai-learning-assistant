@@ -6,14 +6,17 @@ import {
   within,
 } from "@testing-library/react";
 import { useState } from "react";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getLinkedRiskStudentFilters,
   StudentQueryBar,
   StudentSelector,
   useRiskStudentSelection,
 } from "./StudentSelector";
-import { riskStudents } from "./riskData";
+import { riskStudents as allRiskStudents } from "./riskData";
+
+// 使用固定六人样本验证分组和分页，不随演示数据扩容而改变。
+const riskStudents = allRiskStudents.slice(0, 6);
 
 function StudentSelectorHarness() {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
@@ -23,6 +26,7 @@ function StudentSelectorHarness() {
     riskStudents,
     selectedStudentId,
     setSelectedStudentId,
+    { eventTime: ["2026-08-01", "2026-08-31"] },
   );
 
   return (
@@ -38,6 +42,8 @@ function StudentSelectorHarness() {
 }
 
 describe("StudentSelector", () => {
+  beforeEach(() => vi.setSystemTime(new Date("2026-08-10T12:00:00+08:00")));
+  afterEach(() => vi.useRealTimers());
   it("默认展示待处理学生并展示分组数量", async () => {
     render(<StudentSelectorHarness />);
 

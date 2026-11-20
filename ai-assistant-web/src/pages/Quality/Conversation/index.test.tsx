@@ -3,9 +3,27 @@ import {
   filterRiskStudents,
   getEvidenceCommunicationAt,
   riskStudentDetails,
-  riskStudents,
+  riskStudents as allRiskStudents,
   sortRiskStudents,
 } from "./riskData";
+
+// 固定原有样本，避免新增案例改变既有筛选和排序测试的输入。
+const riskStudents = allRiskStudents.slice(0, 6);
+
+describe("新增模拟案例", () => {
+  it("列表状态、待处理数量和详情证据保持一致", () => {
+    expect(allRiskStudents).toHaveLength(14);
+    expect(new Set(allRiskStudents.map((student) => student.id)).size).toBe(14);
+    for (const student of allRiskStudents.slice(6)) {
+      const detail = riskStudentDetails[student.id];
+      const events = detail.eventGroups.flatMap((group) => group.events);
+      expect(detail.student).toEqual(student);
+      expect(events.filter((event) => event.status === "pending")).toHaveLength(student.pendingRiskCount);
+      expect(events.every((event) => event.status === student.status)).toBe(true);
+      expect(events.every((event) => event.evidence.every((evidence) => evidence.fullChat.length >= 2))).toBe(true);
+    }
+  });
+});
 
 describe("filterRiskStudents", () => {
   it("按学生名称或编号模糊搜索", () => {

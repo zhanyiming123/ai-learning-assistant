@@ -1157,6 +1157,74 @@ const detailDefinitions: Array<{
   },
 ];
 
+// 虚构演示案例，不对应真实学生或聊天记录。
+const demoCases: Array<[
+  string, string, RiskLevel, RiskType, RiskEventStatus, string, string, string,
+]> = [
+  ["许星澜", "周欣", "high", "退费", "pending", "A-Level 数学",
+    "两周取消了三次课，孩子下个月就考试了，剩下的课请给我退费明细。",
+    "当天核实取消记录与剩余课时，由主管回访并提供补课和退费方案。"],
+  ["陆景行", "李辰", "high", "客诉", "pending", "雅思冲刺",
+    "报名说按测评定计划，现在内容孩子都学过了，我不满意，请负责人解释。",
+    "复核测评与课堂记录，明天下午前同步调整后的学习计划。"],
+  ["苏予安", "王珊", "medium", "跟进及时性", "pending", "IB 化学",
+    "两次课后反馈都还没收到，孩子哪里没掌握我们不知道，能今天给我吗？",
+    "今天十八点前补齐两次反馈及针对性练习，并确认家长收到。"],
+  ["唐可歆", "孙超", "medium", "客诉", "pending", "AP 物理",
+    "已经说过周三有学校活动，为什么还是排在周三？每次都要提醒，太影响安排了。",
+    "核对学生可用时间，提供两套排课方案，家长确认后锁定课表。"],
+  ["顾书言", "孟涵", "low", "跟进及时性", "pending", "托福写作",
+    "说今天上午发作文批改，现在还没收到，麻烦问一下老师。",
+    "确认批改进度，今天十七点前同步结果，观察是否重复延迟。"],
+  ["程以宁", "赵敏", "medium", "客诉", "resolved", "A-Level 经济",
+    "新老师试听后孩子说能跟上了，后面就按这个老师安排，之前的问题解决了。",
+    "已确认换师方案，维持固定课表，一周后回访学习适应情况。"],
+  ["叶知遥", "钱悦", "low", "退费", "excluded", "SAT 数学",
+    "我只是确认合同里的退费规则，不是要退课，孩子目前上得挺好。",
+    "已核实无退课诉求，留存澄清记录并排除此条预警，保持正常服务。"],
+  ["江予辰", "徐晨", "high", "退费", "resolved", "IB 英语",
+    "搬家转学申请的退款今天收到了，金额无误，谢谢帮忙处理，不用再跟进了。",
+    "家长已确认到账，归档课时结算及退款凭据，结束本次跟进。"],
+];
+
+demoCases.forEach(([name, owner, level, type, status, course, quote, suggestion], index) => {
+  const number = String(index + 7).padStart(3, "0");
+  const id = `risk-student-${number}`;
+  const date = `2026-11-${20 - index}`;
+  const occurredAt = `${date} 10:00`;
+  const student: RiskStudent = {
+    id, studentName: name, studentNumber: `S2026${number}`,
+    status, riskLevel: level, coreRisk: quote,
+    pendingRiskCount: status === "pending" ? 1 : 0,
+    latestRiskTime: occurredAt, owner, dataStatus: "模拟数据",
+  };
+  const event = createEvent({
+    id: `${id}-event`, riskType: type, riskLevel: level, status,
+    ...(status === "resolved" ? { resolvedBy: owner, resolvedAt: `${date} 11:00:00` } : {}),
+    ...(status === "excluded" ? { excludedBy: owner, excludedAt: `${date} 11:00:00` } : {}),
+    riskSummary: quote, handlingSuggestion: suggestion,
+    keywords: [type === "跟进及时性" ? "还没收到" : type],
+    evidence: [createWechatEvidence({
+      id: `${id}-evidence`, sourceType: "wechat_group",
+      groupName: `${name}课程服务群（模拟）`, occurredAt,
+      employee: owner, parentWechatNickname: `${name}家长`,
+      parentText: quote, reply: suggestion,
+    })],
+  });
+  riskStudents.push(student);
+  profiles[id] = {
+    grade: index % 2 ? "11年级" : "12年级",
+    currentFollowUpAdvisor: owner, followUpManager: owner,
+    sharedAdvisor: "钱悦", planner: "李辰", course,
+    serviceMode: "1 对 1", guardianContact: "模拟家长企微",
+    serviceStartDate: "2026-09-01",
+  };
+  detailDefinitions.push({
+    student, groups: [{ date, events: [event] }],
+    summary: `【模拟案例】家长反馈：${quote}`, suggestion,
+  });
+});
+
 export const riskStudentDetails: Record<string, RiskStudentDetail> =
   Object.fromEntries(
     detailDefinitions.map(({ student, groups, summary, suggestion }) => [
